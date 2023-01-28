@@ -1,0 +1,44 @@
+name: ssf
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+jobs:
+#  init:
+#    runs-on: ubuntu-latest
+#    strategy:
+#      matrix:
+#        node-version: [ 16.14.2 ]
+#    steps:
+#      - uses: actions/checkout@v3
+#      - name: Staring Node.js ${{ matrix.node-version }}
+#        uses: actions/setup-node@v3
+#        with:
+#          node-version: ${{ matrix.node-version }}
+#      - name: install modules
+#        run: npm install
+#      - name: build project
+#        run: npm run build
+#      - name: lintfix
+#        run: npm run lintfix
+
+  deploy:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/master'
+    steps:
+      - name: deploy
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SS_HOST }}
+          username: ${{ secrets.SS_USER }}
+          password: ${{ secrets.SS_PASS }}
+          port: ${{ secrets.SS_PORT }}
+          script: |
+            cd /home/ssb/
+            git checkout -f
+            git pull
+            npm prune
+            npm install
+            pm2 reload ssb
+#            pm2 start npm --name "ssf" -- start --node-args="--max-old-space-size=4096"
