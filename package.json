@@ -2,9 +2,9 @@
   "name": "ssb",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "ssb.js",
   "scripts": {
-    "start": "nodemon index.js"
+    "start": "nodemon ssb.js"
   },
   "keywords": [],
   "author": "",
