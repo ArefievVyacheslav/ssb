@@ -11,4 +11,9 @@ server.post('/selects', async (req, res) => {
 })
 
 
+server.get('/test', async (req, res) => {
+  res.status(200).send('<h1>TEST OK!!!</h1>')
+})
+
+
 server.listen(3004, console.log('ON 3004'))
