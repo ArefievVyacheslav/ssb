@@ -2,9 +2,7 @@ const { MongoClient } = require('mongodb')
 const client = new MongoClient('mongodb://localhost:27017')
 
 
-function unique (array, propertyName) {
-  return array.filter((e, i) => array.findIndex(a => a[propertyName] === e[propertyName]) === i)
-}
+const unique = (array, propertyName) => array.filter((e, i) => array.findIndex(a => a[propertyName] === e[propertyName]) === i)
 
 
 module.exports = async function getSelects(filtersObj) {
@@ -18,8 +16,10 @@ module.exports = async function getSelects(filtersObj) {
       subcategory_t: productObj.subcategory_t,
     })), 'subcategory')
 
+    const brand = [ ...new Set(products.map(productObj => productObj.brand), 'brand') ]
+
     return {
-      subcat
+      subcat, brand
     }
   } catch (e) {
     console.log(e);
