@@ -15,7 +15,7 @@ module.exports = async function getSelects(filtersObj) {
 
     const subcat = unique(products.map(productObj => ({
       subcategory: productObj.subcategory,
-      subcategoryT: productObj.subcategoryT,
+      subcategory_t: productObj.subcategory_t,
     })), 'subcategory')
 
     return {
