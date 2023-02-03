@@ -3,6 +3,7 @@ const cors = require('cors')
 const bodyParser = require('body-parser')
 const getSelects = require('./utils/getSelects')
 const getProducts = require('./utils/getProducts')
+const setServiceData = require('./utils/setServiceData')
 
 
 server.use(cors())
@@ -13,6 +14,10 @@ server.post('/selects', async (req, res) => {
 })
 server.post('/products', async (req, res) => {
   res.status(200).send(await getProducts(req.body))
+})
+
+server.put('/service', async (req, res) => {
+  res.status(200).send(await setServiceData(req.body))
 })
 
 
