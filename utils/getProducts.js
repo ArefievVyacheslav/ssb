@@ -6,6 +6,13 @@ module.exports = async function getSelects(filtersObj) {
   try {
     await client.connect()
     const db = await client.db('ss')
+
+    if (filtersObj.findObj?.price) {
+      const startPrice = filtersObj.findObj.price[ '$in' ][0]
+      const endPrice = filtersObj.findObj.price[ '$in' ][1]
+      filtersObj.findObj.price[ '$in' ] = [...Array.from(Array(+endPrice - +startPrice + 1).keys(),x => x + +startPrice)]
+    }
+
     const products = await db.collection(filtersObj.collection).find(filtersObj.findObj).toArray()
 
     const productsTotal = products.map(productObj => ({
