@@ -36,11 +36,12 @@ module.exports = async function getSelects(filtersObj) {
 
     const priceAll = products.map(productObj => productObj.price).sort((a,b)=>a-b)
     const price = [ priceAll[0], priceAll[ priceAll.length - 1 ] ]
-    //   [...Array.from(Array(this.endPrice - this.startPrice + 1).keys(),x => x + this.startPrice)]
 
+    const saleProto = products.map(productObj => productObj.sale)
+    const sale = [ Math.min(...saleProto) - 1, Math.max(...saleProto) - 1 ]
 
     return {
-      subcat, brand, size, price
+      subcat, brand, size, price, sale
     }
   } catch (e) {
     console.log(e);
