@@ -23,6 +23,7 @@ module.exports = async function getSelects(filtersObj) {
       images: productObj.images[0],
       oldprice: productObj.oldprice,
       price: productObj.price,
+      sale: productObj.sale,
       sizes: productObj.sizes,
     }))
 
