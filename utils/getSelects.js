@@ -23,13 +23,14 @@ module.exports = async function getSelects(filtersObj) {
       subcategory_t: productObj.subcategory_t,
     })), 'subcategory')
 
-    const result = { subcat, brand: [], price: [], sale: [], shop: [] }
+    const result = { subcat, brand: [], color: [], price: [], sale: [], shop: [] }
 
     products.map(productObj => {
       if (!result.brand.includes(productObj.brand)) result.brand.push(productObj.brand)
       if (!result.price.includes(productObj.price)) result.price.push(productObj.price)
       if (!result.sale.includes(productObj.sale)) result.sale.push(productObj.sale)
       if (!result.shop.includes(productObj.shop)) result.shop.push(productObj.shop)
+      if (!result.color.includes(productObj.color)) result.color.push(productObj.color)
     })
     result.price = result.price.sort((a,b)=>a-b)
     result.price = [ result.price[ 0 ], result.price[ result.price.length - 1 ] ]
