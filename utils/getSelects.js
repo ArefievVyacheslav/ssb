@@ -23,27 +23,30 @@ module.exports = async function getSelects(filtersObj) {
       subcategory_t: productObj.subcategory_t,
     })), 'subcategory')
 
-    const brand = [ ...new Set(products.map(productObj => productObj.brand)) ]
+    const result = { subcat, brand: [], price: [], sale: [], shop: [] }
+
+    products.map(productObj => {
+      if (!result.brand.includes(productObj.brand)) result.brand.push(productObj.brand)
+      if (!result.price.includes(productObj.price)) result.price.push(productObj.price)
+      if (!result.sale.includes(productObj.sale)) result.sale.push(productObj.sale)
+      if (!result.shop.includes(productObj.shop)) result.shop.push(productObj.shop)
+    })
+    result.price = result.price.sort((a,b)=>a-b)
+    result.price = [ result.price[ 0 ], result.price[ result.price.length - 1 ] ]
+    result.sale = [ Math.min(...result.sale) - 1, Math.max(...result.sale) - 1 ]
 
     const weights = { 'XXXS':-1, 'XXS':0, 'XXS/XS':1, 'XS':2, 'XS/S':3, 'S':4, 'S/M':5, 'M':6, 'M/L':7, 'L':8, 'L/XL':8.5, 'XL':9, 'XXL':10, 'XXXL':11, 'XXXXL':12 }
     let size = [ ...new Set(products.map(productObj => productObj.sizes).flat(Infinity)) ]
     size = size.sort((a, b) => {
       if (!isNaN(a) && !isNaN(b)) return a - b
     })
-    size = [ ...size.filter(el => isNaN(el)).sort((a, b) => {
+    result.size = [ ...size.filter(el => isNaN(el)).sort((a, b) => {
       if (isNaN(a) && isNaN(b)) return weights[a] - weights[b]
     }), ...size.filter(el => !isNaN(el)).sort( (a, b) => a.localeCompare(b, undefined, { numeric:true }) ) ]
 
-    const priceAll = products.map(productObj => productObj.price).sort((a,b)=>a-b)
-    const price = [ priceAll[0], priceAll[ priceAll.length - 1 ] ]
-
-    const saleProto = products.map(productObj => productObj.sale)
-    const sale = [ Math.min(...saleProto) - 1, Math.max(...saleProto) - 1 ]
-
-    return {
-      subcat, brand, size, price, sale
-    }
+    return result
   } catch (e) {
     console.log(e);
   }
 }
+
