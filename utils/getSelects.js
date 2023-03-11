@@ -23,7 +23,7 @@ module.exports = async function getSelects(filtersObj) {
       subcategory_t: productObj.subcategory_t,
     })), 'subcategory')
 
-    const result = { subcat, brand: [], color: [], price: [], sale: [], shop: [] }
+    const result = { subcat,brand:[],brandCountry:[],color:[],country:[],price:[],sale:[],season:[],shop:[],style:[] }
 
     products.map(productObj => {
       if (!result.brand.includes(productObj.brand)) result.brand.push(productObj.brand)
@@ -31,6 +31,10 @@ module.exports = async function getSelects(filtersObj) {
       if (!result.sale.includes(productObj.sale)) result.sale.push(productObj.sale)
       if (!result.shop.includes(productObj.shop)) result.shop.push(productObj.shop)
       if (!result.color.includes(productObj.color)) result.color.push(productObj.color)
+      if (productObj.brandCountry && !result.brandCountry.includes(productObj.brandCountry)) result.brandCountry.push(productObj.brandCountry)
+      if (productObj.country && !result.country.includes(productObj.country)) result.country.push(productObj.country)
+      if (productObj.season && !result.season.includes(productObj.season)) result.season.push(productObj.season)
+      if (productObj.style && !result.style.includes(productObj.style)) result.style.push(productObj.style)
     })
     result.price = result.price.sort((a,b)=>a-b)
     result.price = [ result.price[ 0 ], result.price[ result.price.length - 1 ] ]
