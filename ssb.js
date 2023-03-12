@@ -10,10 +10,21 @@ const getProducts = require('./services/getProducts')
 const setServiceData = require('./services/setServiceData')
 const SelectsDto = require('./services/dto/selectsDto');
 const PaginationDto = require('./services/dto/paginationDto');
+const LoginDto = require('./services/dto/loginDto');
+const login = require('./services/auth/authService');
+const register = require('./services/auth/registerService');
 
 
 server.use(cors())
 server.use(bodyParser.json())
+
+server.post('/login', async (req, res) => {
+  res.status(200).send(await login(new LoginDto(req.body)))
+})
+
+server.post('/register', async (req, res) => {
+  res.status(200).send(await register(new LoginDto(req.body)))
+})
 
 server.post('/selects', cache.route({ expire: 60 * 60 * 24 }), async (req, res) => {
   res.status(200).send(await getSelects(new SelectsDto(req.body.findObj, req.body.collection), new PaginationDto(req.body.pagination)))
