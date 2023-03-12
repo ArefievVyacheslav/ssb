@@ -15,7 +15,7 @@ module.exports = async function login(loginData) {
   try {
     await client.connect();
     const db = await client.db('ss').collection('users');
-    const user = await db.findOne({email: loginData.getEmail()}) || {};
+    const user = await db.findOne({email: loginData.getEmail()});
 
     if (!user) {
       return {
