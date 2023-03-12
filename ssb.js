@@ -1,6 +1,8 @@
 const server = require('express')()
 const cors = require('cors')
-const cache = require('express-redis-cache')();
+const cache = require('express-redis-cache')({
+  host: 'localhost', port: 6379
+});
 
 const bodyParser = require('body-parser')
 const getSelects = require('./services/getSelects')
