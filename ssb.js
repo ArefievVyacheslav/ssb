@@ -1,16 +1,18 @@
 const server = require('express')()
 const cors = require('cors')
 const bodyParser = require('body-parser')
-const getSelects = require('./utils/getSelects')
-const getProducts = require('./utils/getProducts')
-const setServiceData = require('./utils/setServiceData')
+const getSelects = require('./services/getSelects')
+const getProducts = require('./services/getProducts')
+const setServiceData = require('./services/setServiceData')
+const SelectsDto = require('./services/dto/selectsDto');
+const PaginationDto = require('./services/dto/paginationDto');
 
 
 server.use(cors())
 server.use(bodyParser.json())
 
 server.post('/selects', async (req, res) => {
-  res.status(200).send(await getSelects(req.body))
+  res.status(200).send(await getSelects(new SelectsDto(req.body.findObj), new PaginationDto(req.body.pagination)))
 })
 server.post('/products', async (req, res) => {
   res.status(200).send(await getProducts(req.body))
