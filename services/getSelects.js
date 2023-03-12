@@ -13,7 +13,7 @@ module.exports = async function getSelects(selectsData, paginationData) {
     await client.connect();
     const db = await client.db('ss');
 
-    const products = await db.collection(selectsData.getCollection)
+    const products = await db.collection(selectsData.getCollection())
         .find(selectsData.getOldStyle())
         .skip(
             paginationData.getLimit() * paginationData.getPage(),
@@ -25,7 +25,7 @@ module.exports = async function getSelects(selectsData, paginationData) {
       subcategory_t: productObj.subcategory_t,
     })), 'subcategory');
 
-    const result = {subCat, brand: [], brandCountry: [], color: [], price: [], sale: [], shop: []};
+    const result = {subCat, brand: [], brandCountry: [], color: [], country: [], price: [], sale: [], season: [], shop: [], style: []};
 
     products.map(productObj => {
       if (!result.brand.includes(productObj.brand)) {
@@ -72,12 +72,12 @@ module.exports = async function getSelects(selectsData, paginationData) {
         if (isNaN(a) && isNaN(b)) {
           return weights[a] - weights[b];
         }
-      }), ...size.filter(el => !isNaN(el)).sort((a, b) => a.localeCompare(b, undefined, {numeric: true}))
-    ]
+      }), ...size.filter(el => !isNaN(el)).sort((a, b) => a.localeCompare(b, undefined, {numeric: true})),
+    ];
 
-    return result
+    return result;
   } catch (e) {
     console.log(e);
   }
-}
+};
 

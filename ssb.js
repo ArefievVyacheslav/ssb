@@ -1,5 +1,7 @@
 const server = require('express')()
 const cors = require('cors')
+const cache = require('express-redis-cache')();
+
 const bodyParser = require('body-parser')
 const getSelects = require('./services/getSelects')
 const getProducts = require('./services/getProducts')
@@ -11,8 +13,8 @@ const PaginationDto = require('./services/dto/paginationDto');
 server.use(cors())
 server.use(bodyParser.json())
 
-server.post('/selects', async (req, res) => {
-  res.status(200).send(await getSelects(new SelectsDto(req.body.findObj), new PaginationDto(req.body.pagination)))
+server.post('/selects', cache.route(), async (req, res) => {
+  res.status(200).send(await getSelects(new SelectsDto(req.body.findObj, req.body.collection), new PaginationDto(req.body.pagination)))
 })
 server.post('/products', async (req, res) => {
   res.status(200).send(await getProducts(req.body))
