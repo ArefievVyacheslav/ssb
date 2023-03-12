@@ -15,7 +15,7 @@ const PaginationDto = require('./services/dto/paginationDto');
 server.use(cors())
 server.use(bodyParser.json())
 
-server.post('/selects', cache.route({ expire: 60 * 10 }), async (req, res) => {
+server.post('/selects', cache.route({ expire: 60 * 60 * 24 }), async (req, res) => {
   res.status(200).send(await getSelects(new SelectsDto(req.body.findObj, req.body.collection), new PaginationDto(req.body.pagination)))
 })
 server.post('/products', async (req, res) => {
