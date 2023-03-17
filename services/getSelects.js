@@ -20,12 +20,12 @@ module.exports = async function getSelects(selectsData, paginationData) {
         ).limit(paginationData.getLimit())
         .toArray();
 
-    const subCat = unique(products.map(productObj => ({
+    const subcat = unique(products.map(productObj => ({
       subcategory: productObj.subcategory,
       subcategory_t: productObj.subcategory_t,
     })), 'subcategory');
 
-    const result = {subCat, brand: [], brandCountry: [], color: [], country: [], price: [], sale: [], season: [], shop: [], style: []};
+    const result = {subcat, brand: [], brandCountry: [], color: [], country: [], price: [], sale: [], season: [], shop: [], style: []};
 
     products.map(productObj => {
       if (!result.brand.includes(productObj.brand)) {
@@ -54,6 +54,9 @@ module.exports = async function getSelects(selectsData, paginationData) {
       }
       if (productObj.style && !result.style.includes(productObj.style)) {
         result.style.push(productObj.style);
+      }
+      if (productObj.subcat && !result.subcat.includes(productObj.subcat)) {
+        result.subcat.push(productObj.subcat);
       }
     });
     result.price = result.price.sort((a, b) => a - b);
