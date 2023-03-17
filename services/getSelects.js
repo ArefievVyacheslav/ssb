@@ -4,7 +4,7 @@ const client = new MongoClient('mongodb://localhost:27017');
 const unique = (array, propertyName) => array.filter((e, i) => array.findIndex(a => a[propertyName] === e[propertyName]) === i);
 
 /**
- * @returns {Promise<{sale: *[], shop: *[], color: *[], price: *[], subcat: *, brand: *[]}>}
+ * @returns {Promise<{sale: *[], shop: *[], color: *[], price: *[], subCat: *, brand: *[]}>}
  * @param selectsData: SelectsDto
  * @param paginationData: PaginationDto
  */
@@ -20,12 +20,12 @@ module.exports = async function getSelects(selectsData, paginationData) {
         ).limit(paginationData.getLimit())
         .toArray();
 
-    const subcat = unique(products.map(productObj => ({
+    const subCat = unique(products.map(productObj => ({
       subcategory: productObj.subcategory,
       subcategory_t: productObj.subcategory_t,
     })), 'subcategory');
 
-    const result = {subcat, brand: [], brandCountry: [], color: [], country: [], price: [], sale: [], season: [], shop: [], style: []};
+    const result = {subCat, brand: [], brandCountry: [], color: [], country: [], price: [], sale: [], season: [], shop: [], style: []};
 
     products.map(productObj => {
       if (!result.brand.includes(productObj.brand)) {
@@ -55,8 +55,8 @@ module.exports = async function getSelects(selectsData, paginationData) {
       if (productObj.style && !result.style.includes(productObj.style)) {
         result.style.push(productObj.style);
       }
-      if (productObj.subcat && !result.subcat.includes(productObj.subcat)) {
-        result.subcat.push(productObj.subcat);
+      if (productObj.subCat && !result.subCat.includes(productObj.subCat)) {
+        result.subCat.push(productObj.subCat);
       }
     });
     result.price = result.price.sort((a, b) => a - b);
