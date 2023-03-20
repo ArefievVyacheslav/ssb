@@ -18,12 +18,12 @@ module.exports = async function getSelects(filtersObj) {
 
     const products = await db.collection(filtersObj.collection).find(filtersObj.findObj).toArray()
 
-    const subcat = unique(products.map(productObj => ({
+    const subCat = unique(products.map(productObj => ({
       subcategory: productObj.subcategory,
       subcategory_t: productObj.subcategory_t,
     })), 'subcategory')
 
-    const result = { subcat,brand:[],brandCountry:[],color:[],country:[],price:[],sale:[],season:[],shop:[],style:[] }
+    const result = { subCat,brand:[],brandCountry:[],color:[],country:[],price:[],sale:[],season:[],shop:[],style:[] }
 
     products.map(productObj => {
       if (!result.brand.includes(productObj.brand)) result.brand.push(productObj.brand)
