@@ -16,15 +16,13 @@ module.exports = async function getSelects(filtersObj) {
     const products = await db.collection(filtersObj.collection).find(filtersObj.findObj).toArray()
 
     const productsTotal = products.map(productObj => ({
-      benefit: productObj.benefit,
+      id: productObj.id,
       brand: productObj.brand,
-      link: productObj.link,
       name: productObj.name,
       images: productObj.images[0],
       oldprice: productObj.oldprice,
       price: productObj.price,
-      sale: productObj.sale,
-      sizes: productObj.sizes,
+      sale: productObj.sale
     }))
 
     const result = []
