@@ -35,7 +35,7 @@ module.exports = async function getSelects(filtersObj) {
         color_t: productObj.color_t
       })
       if (productObj.brandCountry && !result.brandCountry.includes(productObj.brandCountry)) result.brandCountry.push(productObj.brandCountry)
-      if (productObj.country && !result.country.includes(productObj.country)) result.country.push({
+      if (productObj.country && !result.country.map(colorObj => colorObj.country).includes(productObj.country)) result.country.push({
         country: productObj.country,
         country_t: productObj.country_t
       })
