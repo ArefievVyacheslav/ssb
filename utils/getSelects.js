@@ -1,5 +1,5 @@
 const { MongoClient } = require('mongodb')
-const client = new MongoClient('mongodb://local:Qwerty_123@localhost:27017')
+const client = new MongoClient('mongodb://localhost:27017')
 
 
 const unique = (array, propertyName) => array.filter((e, i) => array.findIndex(a => a[propertyName] === e[propertyName]) === i)
