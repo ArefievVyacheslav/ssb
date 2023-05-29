@@ -1,4 +1,4 @@
-name: ssf
+name: ssb
 on:
   push:
     branches: [ master ]
@@ -22,5 +22,4 @@ jobs:
             git pull
             npm prune
             npm install
-            pm2 reload ssb
-#            pm2 start npm --name "ssf" -- start --node-args="--max-old-space-size=4096"
+            pm2 restart ssb
