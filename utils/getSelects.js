@@ -35,7 +35,10 @@ module.exports = async function getSelects(filtersObj) {
         color_t: productObj.color_t
       })
       if (productObj.brandCountry && !result.brandCountry.includes(productObj.brandCountry)) result.brandCountry.push(productObj.brandCountry)
-      if (productObj.country && !result.country.includes(productObj.country)) result.country.push(productObj.country)
+      if (productObj.country && !result.country.includes(productObj.country)) result.country.push({
+        country: productObj.country,
+        country_t: productObj.country_t
+      })
       if (productObj.season && !result.season.includes(productObj.season)) result.season.push(productObj.season)
       if (productObj.style && !result.style.includes(productObj.style)) result.style.push(productObj.style)
     })
