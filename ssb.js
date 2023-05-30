@@ -4,6 +4,7 @@ const bodyParser = require('body-parser')
 const getSelects = require('./utils/getSelects')
 const getProducts = require('./utils/getProducts')
 const getProduct = require('./utils/getProduct')
+const setLike = require('./utils/setLike')
 const setServiceData = require('./utils/setServiceData')
 
 
@@ -18,6 +19,9 @@ server.post('/products', async (req, res) => {
 })
 server.post('/product', async (req, res) => {
   res.status(200).send(await getProduct(req.body))
+})
+server.post('/like', async (req, res) => {
+  res.status(200).send(await setLike(req.body))
 })
 server.put('/service', async (req, res) => {
   res.status(200).send(await setServiceData(req.body))
