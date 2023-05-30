@@ -17,6 +17,7 @@ module.exports = async function getSelects(filtersObj) {
 
     const productsTotal = products.map(productObj => ({
       id: productObj.id,
+      category: productObj.category,
       category_t: productObj.category_t,
       brand: productObj.brand,
       name: productObj.name,
