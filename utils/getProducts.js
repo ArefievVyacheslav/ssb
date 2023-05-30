@@ -20,7 +20,7 @@ module.exports = async function getSelects(filtersObj) {
       brand: productObj.brand,
       category_t: productObj.category_t,
       collection: filtersObj.collection,
-      like: filtersObj.like,
+      like: productObj.like,
       name: productObj.name,
       images: productObj.images[0],
       oldprice: productObj.oldprice,
