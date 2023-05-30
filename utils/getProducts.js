@@ -17,9 +17,10 @@ module.exports = async function getSelects(filtersObj) {
 
     const productsTotal = products.map(productObj => ({
       id: productObj.id,
-      collection: filtersObj.collection,
-      category_t: productObj.category_t,
       brand: productObj.brand,
+      category_t: productObj.category_t,
+      collection: filtersObj.collection,
+      like: filtersObj.like,
       name: productObj.name,
       images: productObj.images[0],
       oldprice: productObj.oldprice,
