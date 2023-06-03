@@ -20,12 +20,14 @@ module.exports = async function getSelects(filtersObj) {
       brand: productObj.brand,
       category_t: productObj.category_t,
       collection: filtersObj.collection,
+      color: productObj.color,
       like: productObj.like,
       name: productObj.name,
       images: productObj.images[0],
       oldprice: productObj.oldprice,
       price: productObj.price,
-      sale: productObj.sale
+      sale: productObj.sale,
+      shop: productObj.shop
     }))
 
     const result = []
