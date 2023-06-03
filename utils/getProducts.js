@@ -27,7 +27,8 @@ module.exports = async function getSelects(filtersObj) {
       oldprice: productObj.oldprice,
       price: productObj.price,
       sale: productObj.sale,
-      shop: productObj.shop
+      shop: productObj.shop,
+      sizes: productObj.sizes
     }))
 
     const result = []
