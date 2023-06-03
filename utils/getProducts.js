@@ -22,6 +22,7 @@ module.exports = async function getSelects(filtersObj) {
       collection: filtersObj.collection,
       color: productObj.color,
       like: productObj.like,
+      link: productObj.link,
       name: productObj.name,
       images: productObj.images[0],
       oldprice: productObj.oldprice,
