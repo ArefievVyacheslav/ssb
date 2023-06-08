@@ -30,7 +30,8 @@ module.exports = async function getSelects(filtersObj) {
       if (!result.price.includes(productObj.price)) result.price.push(productObj.price)
       if (!result.sale.includes(productObj.sale)) result.sale.push(productObj.sale)
       if (!result.shop.includes(productObj.shop)) result.shop.push(productObj.shop)
-      if (!result.color.map(colorObj => colorObj.color).includes(productObj.color)) result.color.push({
+      if (!result.color.map(colorObj => colorObj.color).includes(productObj.color)
+        && productObj.color && productObj.color !== 's' && productObj.color !== 'true black') result.color.push({
         color: productObj.color,
         color_t: productObj.color_t
       })
