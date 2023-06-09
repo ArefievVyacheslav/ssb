@@ -11,12 +11,12 @@ module.exports = async function setMetrikaGoal (goal) {
     // Формирование данных для запроса
     const headers = { Authorization: 'OAuth ' + accessToken };
     const payload = {
-      goalId,
-      counterId,
+      goal_id: goalId,
+      counter_id: counterId,
       type: 'goal',
-      orderId: goal.orderId,
+      order_id: goal.orderId,
       price: goal.orderAmount,
-      currency: goal.orderCurrency,
+      revenue: goal.orderCurrency,
       income: goal.income
     };
     console.log(payload)
