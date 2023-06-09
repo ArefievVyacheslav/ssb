@@ -1,45 +1,40 @@
-const https = require('https');
+const axios = require('axios')
 
 module.exports = async function setMetrikaGoal (goal) {
   try {
     // Параметры запроса
+    const apiUrl = `https://api-metrika.yandex.net/management/v1/counter/{counterId}/goals/{goalId}/events`;
     const counterId = '89951108';
     const goalId = '299218301';
-    const token = 'y0_AgAAAAA3QeKgAAoHKAAAAADlD9faTmCwibEaSEeAPIC-HAg3wbdLGRU';
+    const accessToken = 'y0_AgAAAAA3QeKgAAoHKAAAAADlD9faTmCwibEaSEeAPIC-HAg3wbdLGRU';
 
-    const conversionData = {
-      order_id: goal.orderId, // Идентификатор заказа
-      goal_id: goalId, // Идентификатор цели
-      datetime: new Date().toISOString(), // Дата и время конверсии
-      revenue: goal.orderAmount, // Сумма заказа
-      currency: 'RUB', // Валюта заказа
-      income: goal.income // Дополнительная информация о доходе
+    // Формирование данных для запроса
+    const headers = { Authorization: 'OAuth ' + accessToken };
+    const payload = {
+      goalId,
+      counterId,
+      type: 'goal',
+      orderId: goal.orderId,
+      price: goal.orderAmount,
+      currency: goal.orderCurrency,
+      income: goal.income
     };
+    console.log(payload)
 
-    const options = {
-      hostname: 'api-metrika.yandex.net',
-      path: `/management/v1/counter/${ counterId }/offline_conversions?oauth_token=${ token }`,
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-yametrika+json',
-        Authorization: 'OAuth ' + token
-      }
-    };
-
-    const req = https.request(options, (res) => {
-      console.log(`Status code: ${ res.statusCode }`);
-
-      res.on('data', (data) => {
-        console.log(data.toString());
+    // Отправка запроса
+    try {
+      const response = await axios.post(apiUrl.replace('{counterId}', counterId).replace('{goalId}', goalId), payload, {
+        headers,
       });
-    });
 
-    req.on('error', (error) => {
-      console.error('Произошла ошибка при отправке данных офлайн конверсии:', error);
-    });
-
-    req.write(JSON.stringify(conversionData));
-    req.end();
+      if (response.status === 202) {
+        console.log('Запрос успешно отправлен.');
+      } else {
+        console.log('Произошла ошибка при отправке запроса:', response.data);
+      }
+    } catch (error) {
+      console.log('Произошла ошибка при отправке запроса:', error.message);
+    }
   } catch (e) {
     console.log(e)
   }
