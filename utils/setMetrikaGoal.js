@@ -15,14 +15,14 @@ module.exports = async function setMetrikaGoal (goal) {
       currency: 'RUB', // Валюта заказа
       income: goal.income // Дополнительная информация о доходе
     };
-    console.log(conversionData)
 
     const options = {
       hostname: 'api-metrika.yandex.net',
       path: `/management/v1/counter/${ counterId }/offline_conversions?oauth_token=${ token }`,
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        Authorization: 'OAuth ' + token
       }
     };
 
