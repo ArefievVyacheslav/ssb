@@ -15,7 +15,7 @@ async function getSitemap () {
         sitemap.push(`/product/${transliteration(product.name.toLowerCase())}-${collection.toLowerCase()}-${product.id}`)
       })
     }
-    await writeFileSync('../../ssf/static/sitemap.txt', sitemap.reduce((acc, link) => acc += 'https://sales-search.ru' + link + '\n', ''), 'utf-8', (err) => {})
+    await writeFileSync('../ssf/static/sitemap.txt', sitemap.reduce((acc, link) => acc += 'https://sales-search.ru' + link + '\n', ''), 'utf-8', (err) => {})
     return sitemap
   } catch (e) {
     console.log(e)
