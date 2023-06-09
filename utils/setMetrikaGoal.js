@@ -1,56 +1,44 @@
-const axios = require('axios')
+const https = require('https');
 
 module.exports = async function setMetrikaGoal (goal) {
   try {
     // Параметры запроса
-    const apiUrl = `https://api-metrika.yandex.net/management/v1/counter/{counterId}/goals/{goalId}/events`;
     const counterId = '89951108';
     const goalId = '299218301';
-    const accessToken = '703d9270549a4abe92400392ec46f233';
+    const token = '703d9270549a4abe92400392ec46f233';
 
-    // Формирование данных для запроса
-    const headers = { Authorization: 'OAuth ' + accessToken };
-    const payload = {
-      goal_id: goalId,
-      counter_id: counterId,
-      type: 'goal',
-      order_id: goal.orderId,
-      price: goal.orderAmount,
-      currency: goal.orderCurrency,
-      income: goal.income
+    const conversionData = {
+      order_id: goal.orderId, // Идентификатор заказа
+      goal_id: goalId, // Идентификатор цели
+      datetime: new Date().toISOString(), // Дата и время конверсии
+      revenue: goal.orderAmount, // Сумма заказа
+      currency: 'RUB', // Валюта заказа
+      income: goal.income // Дополнительная информация о доходе
+    };
+    console.log(conversionData)
+
+    const options = {
+      hostname: 'api-metrika.yandex.net',
+      path: `/management/v1/counter/${ counterId }/offline_conversions?oauth_token=${ token }`,
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      }
     };
 
-    // Отправка запроса
-    try {
-      const response = await axios.post(apiUrl.replace('{counterId}', counterId).replace('{goalId}', goalId), payload, {
-        headers,
-      });
+    const req = https.request(options, (res) => {
+      console.log(`Status code: ${ res.statusCode }`);
 
-      if (response.status === 202) {
-        console.log('Запрос успешно отправлен.');
-      } else {
-        console.log('Произошла ошибка при отправке запроса:', response.data);
-      }
-    } catch (error) {
-      console.log('Произошла ошибка при отправке запроса:', error.message);
-    }
-  } catch (e) {
-    console.log(e)
+      res.on('data', (data) => {
+        console.log(data.toString());
+      });
+    });
+
+    req.on('error', (error) => {
+      console.error('Произошла ошибка при отправке данных офлайн конверсии:', error);
+    });
+
+    req.write(JSON.stringify(conversionData));
+    req.end();
   }
 }
-
-
-// const metrika = new YandexMetrika({
-//   counterId: '89951108',
-//   token: '703d9270549a4abe92400392ec46f233'
-// });
-//
-// const conversionData = {
-//   order_id: '12345', // Идентификатор заказа
-//   goal_id: 'Ваш_ID_цели', // Идентификатор цели
-//   datetime: new Date(), // Дата и время конверсии
-//   revenue: 100.50, // Сумма заказа
-//   currency: 'RUB', // Валюта заказа
-//   income: 50.25 // Дополнительная информация о доходе
-// };
-// }
