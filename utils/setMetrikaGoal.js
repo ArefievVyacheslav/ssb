@@ -5,7 +5,7 @@ module.exports = async function setMetrikaGoal (goal) {
     // Параметры запроса
     const counterId = '89951108';
     const goalId = '299218301';
-    const token = '703d9270549a4abe92400392ec46f233';
+    const token = 'y0_AgAAAAA3QeKgAAoHKAAAAADlD9faTmCwibEaSEeAPIC-HAg3wbdLGRU';
 
     const conversionData = {
       order_id: goal.orderId, // Идентификатор заказа
