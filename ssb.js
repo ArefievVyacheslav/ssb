@@ -5,6 +5,7 @@ const getSelects = require('./utils/getSelects')
 const getProducts = require('./utils/getProducts')
 const getProduct = require('./utils/getProduct')
 const getSitemap = require('./utils/getSitemap')
+const setMetrikaGoal = require('./utils/setMetrikaGoal')
 const setLike = require('./utils/setLike')
 const setServiceData = require('./utils/setServiceData')
 
@@ -23,6 +24,9 @@ server.post('/product', async (req, res) => {
 })
 server.get('/sitemap', async (req, res) => {
   res.status(200).send(await getSitemap())
+})
+server.post('/goal', async (req, res) => {
+  res.status(200).send(await setMetrikaGoal(req.body))
 })
 server.post('/like', async (req, res) => {
   res.status(200).send(await setLike(req.body))
