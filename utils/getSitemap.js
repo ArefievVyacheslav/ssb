@@ -1,9 +1,9 @@
 const { MongoClient } = require('mongodb')
 const client = new MongoClient('mongodb://localhost:27017')
 const { writeFileSync } = require('fs')
-const transliteration = require('../utils/transliteration');
+const transliteration = require('../utils/transliteration')
 
-(async function getSitemap () {
+async function getSitemap () {
   try {
     await client.connect()
     const db = await client.db('ss')
@@ -20,4 +20,4 @@ const transliteration = require('../utils/transliteration');
   } catch (e) {
     console.log(e)
   }
-})()
+}
