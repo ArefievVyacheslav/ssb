@@ -40,5 +40,7 @@ module.exports = async function setMetrikaGoal (goal) {
 
     req.write(JSON.stringify(conversionData));
     req.end();
+  } catch (e) {
+    console.log(e)
   }
 }
