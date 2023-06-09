@@ -21,7 +21,7 @@ module.exports = async function setMetrikaGoal (goal) {
       path: `/management/v1/counter/${ counterId }/offline_conversions?oauth_token=${ token }`,
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
+        'Content-Type': 'application/x-yametrika+json',
         Authorization: 'OAuth ' + token
       }
     };
