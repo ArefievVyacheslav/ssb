@@ -54,7 +54,7 @@ module.exports = async function getSelects(filtersObj) {
     })
     result.size = [ ...size.filter(el => isNaN(el)).sort((a, b) => {
       if (isNaN(a) && isNaN(b)) return weights[a] - weights[b]
-    }), ...size.filter(el => !isNaN(el)).sort( (a, b) => a.localeCompare(b, undefined, { numeric:true }) ) ]
+    }), ...size.filter(el => el && !isNaN(el)).sort( (a, b) => a.localeCompare(b, undefined, { numeric:true }) ) ]
 
     return result
   } catch (e) {
