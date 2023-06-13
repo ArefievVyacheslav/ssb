@@ -21,27 +21,36 @@ module.exports = async function getSelects(filtersObj) {
     const subCat = unique(products.map(productObj => ({
       subcategory: productObj.subcategory,
       subcategory_t: productObj.subcategory_t,
-    })), 'subcategory')
+    })), 'subcategory').map(subCat => {
+      subCat.subcategory_t.replaceAll(' ', '-')
+      return subCat
+    })
 
     const result = { subCat,brand:[],brandCountry:[],color:[],country:[],price:[],sale:[],season:[],shop:[],style:[] }
 
     products.map(productObj => {
-      if (!result.brand.includes(productObj.brand)) result.brand.push(productObj.brand)
+      if (!result.brand.includes(productObj.brand.toUpperCase())) result.brand.push(productObj.brand.toUpperCase())
       if (!result.price.includes(productObj.price)) result.price.push(productObj.price)
       if (!result.sale.includes(productObj.sale)) result.sale.push(productObj.sale)
-      if (!result.shop.includes(productObj.shop)) result.shop.push(productObj.shop)
+      if (!result.shop.includes(productObj.shop)) result.shop.push(productObj.shop.replaceAll(' ', '-'))
       if (!result.color.map(colorObj => colorObj.color).includes(productObj.color)
         && productObj.color && productObj.color !== 's' && productObj.color !== 'true black') result.color.push({
         color: productObj.color,
-        color_t: productObj.color_t
+        color_t: productObj.color_t.replaceAll(' ', '-').replaceAll('/', '-')
       })
       if (productObj.brandCountry && !result.brandCountry.includes(productObj.brandCountry)) result.brandCountry.push(productObj.brandCountry)
-      if (productObj.country && !result.country.map(colorObj => colorObj.country).includes(productObj.country)) result.country.push({
+      if (productObj.country && !result.country.map(countryObj => countryObj.country).includes(productObj.country)) result.country.push({
         country: productObj.country,
-        country_t: productObj.country_t
+        country_t: productObj.country_t.replaceAll(' ', '-').replaceAll('/', '-')
       })
-      if (productObj.season && !result.season.includes(productObj.season)) result.season.push(productObj.season)
-      if (productObj.style && !result.style.includes(productObj.style)) result.style.push(productObj.style)
+      if (!result.season.map(seasonObj => seasonObj.season).includes(productObj.season) && productObj.season) result.season.push({
+        season: productObj.season,
+        season_t: productObj.season_t.replaceAll(' ', '-').replaceAll('/', '-')
+      })
+      if (!result.style.map(styleObj => styleObj.style).includes(productObj.style) && productObj.style) result.style.push({
+        style: productObj.style,
+        style_t: productObj.style_t.replaceAll(' ', '-').replaceAll('/', '-')
+      })
     })
     result.price = result.price.sort((a,b)=>a-b)
     result.price = [ result.price[ 0 ], result.price[ result.price.length - 1 ] ]
