@@ -17,7 +17,7 @@ server.use(bodyParser.json());
 
 // Middleware для кэширования
 const cacheMiddleware = (req, res, next) => {
-  const key = req.baseUrl + req.path + JSON.stringify(req.query);
+  const key = req.originalUrl;
   const cachedData = cache.get(key);
 
   if (cachedData) {
@@ -66,7 +66,7 @@ server.get('/clearCache', (req, res) => {
   res.setHeader('Cache-Control', 'no-store');
   res.setHeader('Expires', '0');
   res.send('Кэш успешно сброшен');
-})
+});
 
 server.listen(3004, () => {
   console.log('ON 3004');
