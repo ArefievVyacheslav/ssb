@@ -61,23 +61,6 @@ app.get('/sitemap', cacheMiddleware, async (req, res) => {
   res.status(200).send(data);
 });
 
-app.get('/clear-cache', async (req, res) => {
-  try {
-    client.flushdb((err, succeeded) => {
-      if (err) {
-        console.error('Ошибка при очистке кэша:', err);
-        res.status(500).send('Ошибка при очистке кэша');
-      } else {
-        console.log('Кэш успешно очищен');
-        res.status(200).send('Кэш успешно очищен');
-      }
-    });
-  } catch (err) {
-    console.error('Ошибка при очистке кэша:', err);
-    res.status(500).send('Ошибка при очистке кэша');
-  }
-});
-
 app.listen(port, () => {
   console.log(`Сервер запущен на порту ${port}`);
 });
