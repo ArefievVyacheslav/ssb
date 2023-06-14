@@ -1,8 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
-const redis = require('redis');
-const { promisify } = require('util');
+const Redis = require('ioredis');
 
 const getSelects = require('./utils/getSelects');
 const getProducts = require('./utils/getProducts');
@@ -12,14 +11,8 @@ const setMetrikaGoal = require('./utils/setMetrikaGoal');
 const setLike = require('./utils/setLike');
 const setServiceData = require('./utils/setServiceData');
 
-const client = redis.createClient({
-  host: 'localhost',
-  port: 6379
-});
-const asyncGet = promisify(client.get).bind(client);
-const asyncSet = promisify(client.set).bind(client);
-
 const server = express();
+const redisClient = new Redis();
 
 server.use(cors());
 server.use(bodyParser.json());
@@ -27,16 +20,20 @@ server.use(bodyParser.json());
 // Middleware для кэширования
 const cacheMiddleware = async (req, res, next) => {
   const key = req.baseUrl + req.path + JSON.stringify(req.body) + JSON.stringify(req.query);
-  const cachedData = await asyncGet(key);
-
-  if (cachedData) {
-    await res.send(cachedData);
-  } else {
-    res.sendResponse = res.send;
-    res.send = async (body) => {
-      await asyncSet(key, body);
-      res.sendResponse(body);
-    };
+  try {
+    const cachedData = await redisClient.get(key);
+    if (cachedData) {
+      res.send(cachedData);
+    } else {
+      res.sendResponse = res.send;
+      res.send = async (body) => {
+        await redisClient.set(key, body);
+        res.sendResponse(body);
+      };
+      next();
+    }
+  } catch (error) {
+    console.error('Ошибка при получении данных из кэша', error);
     next();
   }
 };
@@ -69,18 +66,16 @@ server.put('/service', async (req, res) => {
   res.status(200).send(await setServiceData(req.body));
 });
 
-const { exec } = require('child_process');
-
-server.get('/clearCache', (req, res) => {
-  exec('redis-cli FLUSHALL', (error, stdout, stderr) => {
-    if (error) {
-      res.status(500).send('Ошибка при сбросе кэша');
-    } else {
-      res.send('Кэш успешно сброшен');
-    }
-  });
+server.get('/clearCache', async (req, res) => {
+  try {
+    await redisClient.flushall();
+    res.send('Кэш успешно сброшен');
+  } catch (error) {
+    console.error('Ошибка при сбросе кэша', error);
+    res.status(500).send('Ошибка при сбросе кэша');
+  }
 });
 
 server.listen(3004, () => {
-  console.log('ON 3004');
+  console.log('Сервер запущен на порту 3004');
 });
