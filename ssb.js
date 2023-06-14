@@ -12,13 +12,6 @@ const setMetrikaGoal = require('./utils/setMetrikaGoal');
 const setLike = require('./utils/setLike');
 const setServiceData = require('./utils/setServiceData');
 
-const client = redis.createClient({
-  host: 'localhost',
-  port: 6379
-});
-const asyncGet = promisify(client.get).bind(client);
-const asyncSet = promisify(client.set).bind(client);
-
 const server = express();
 
 server.use(cors());
@@ -26,6 +19,13 @@ server.use(bodyParser.json());
 
 // Middleware для кэширования
 const cacheMiddleware = async (req, res, next) => {
+  const client = redis.createClient({
+    host: 'localhost',
+    port: 6379
+  });
+  const asyncGet = promisify(client.get).bind(client);
+  const asyncSet = promisify(client.set).bind(client);
+
   const key = req.baseUrl + req.path + JSON.stringify(req.body) + JSON.stringify(req.query);
   const cachedData = await asyncGet(key);
 
@@ -39,6 +39,8 @@ const cacheMiddleware = async (req, res, next) => {
     };
     next();
   }
+
+  client.quit(); // Закрыть клиент Redis после использования
 };
 
 server.post('/selects', cacheMiddleware, async (req, res) => {
