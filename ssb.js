@@ -1,7 +1,8 @@
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
-const NodeCache = require('node-cache');
+const redis = require('redis');
+const { promisify } = require('util');
 
 const getSelects = require('./utils/getSelects');
 const getProducts = require('./utils/getProducts');
@@ -11,23 +12,26 @@ const setMetrikaGoal = require('./utils/setMetrikaGoal');
 const setLike = require('./utils/setLike');
 const setServiceData = require('./utils/setServiceData');
 
+const client = redis.createClient();
+const asyncGet = promisify(client.get).bind(client);
+const asyncSet = promisify(client.set).bind(client);
+
 const server = express();
-const cache = new NodeCache();
 
 server.use(cors());
 server.use(bodyParser.json());
 
 // Middleware для кэширования
-const cacheMiddleware = (req, res, next) => {
+const cacheMiddleware = async (req, res, next) => {
   const key = req.baseUrl + req.path + JSON.stringify(req.body) + JSON.stringify(req.query);
-  const cachedData = cache.get(key);
+  const cachedData = await asyncGet(key);
 
   if (cachedData) {
-    res.send(cachedData);
+    await res.send(cachedData);
   } else {
     res.sendResponse = res.send;
-    res.send = (body) => {
-      cache.set(key, body);
+    res.send = async (body) => {
+      await asyncSet(key, body);
       res.sendResponse(body);
     };
     next();
@@ -46,7 +50,7 @@ server.post('/product', cacheMiddleware, async (req, res) => {
   res.status(200).send(await getProduct(req.body));
 });
 
-server.get('/sitemap', cacheMiddleware, async (req, res) => {
+server.get('/sitemap', async (req, res) => {
   res.status(200).send(await getSitemap());
 });
 
@@ -63,9 +67,14 @@ server.put('/service', async (req, res) => {
 });
 
 // Роут для сброса всего кэша
-server.get('/clearCache', (req, res) => {
-  cache.flushAll();
-  res.send('Кэш успешно сброшен');
+server.get('/clear-cache', (req, res) => {
+  client.flushall((err) => {
+    if (err) {
+      res.status(500).send('Ошибка при сбросе кэша');
+    } else {
+      res.send('Кэш успешно сброшен');
+    }
+  });
 });
 
 server.listen(3004, () => {
