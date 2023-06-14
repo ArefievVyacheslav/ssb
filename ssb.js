@@ -18,7 +18,7 @@ server.use(cors());
 server.use(bodyParser.json());
 
 // Middleware для кэширования
-const cacheMiddleware = async (req, res, next) => {
+const cacheMiddleware = () => {
   const client = redis.createClient({
     host: 'localhost',
     port: 6379
@@ -26,36 +26,36 @@ const cacheMiddleware = async (req, res, next) => {
   const asyncGet = promisify(client.get).bind(client);
   const asyncSet = promisify(client.set).bind(client);
 
-  const key = req.baseUrl + req.path + JSON.stringify(req.body) + JSON.stringify(req.query);
-  const cachedData = await asyncGet(key);
+  return async (req, res, next) => {
+    const key = req.baseUrl + req.path + JSON.stringify(req.body) + JSON.stringify(req.query);
+    const cachedData = await asyncGet(key);
 
-  if (cachedData) {
-    res.send(cachedData);
-  } else {
-    res.sendResponse = res.send;
-    res.send = async (body) => {
-      await asyncSet(key, body);
-      res.sendResponse(body);
-    };
-    next();
-  }
-
-  client.quit(); // Закрыть клиент Redis после использования
+    if (cachedData) {
+      res.send(cachedData);
+    } else {
+      res.sendResponse = res.send;
+      res.send = async (body) => {
+        await asyncSet(key, body);
+        res.sendResponse(body);
+      };
+      next();
+    }
+  };
 };
 
-server.post('/selects', cacheMiddleware, async (req, res) => {
+server.post('/selects', cacheMiddleware(), async (req, res) => {
   res.status(200).send(await getSelects(req.body));
 });
 
-server.post('/products', cacheMiddleware, async (req, res) => {
+server.post('/products', cacheMiddleware(), async (req, res) => {
   res.status(200).send(await getProducts(req.body));
 });
 
-server.post('/product', cacheMiddleware, async (req, res) => {
+server.post('/product', cacheMiddleware(), async (req, res) => {
   res.status(200).send(await getProduct(req.body));
 });
 
-server.get('/sitemap', cacheMiddleware, async (req, res) => {
+server.get('/sitemap', cacheMiddleware(), async (req, res) => {
   res.status(200).send(await getSitemap());
 });
 
