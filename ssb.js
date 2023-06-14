@@ -68,7 +68,7 @@ server.put('/service', async (req, res) => {
 
 // Роут для сброса всего кэша
 server.get('/clearCache', (req, res) => {
-  client.flushdb((err, reply) => {
+  client.flushall((err, reply) => {
     if (err) {
       res.status(500).send('Ошибка при сбросе кэша');
     } else {
