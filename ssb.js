@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
-const Redis = require('ioredis');
+const redis = require('redis');
 const { promisify } = require('util');
 
 const getSelects = require('./utils/getSelects');
@@ -12,12 +12,12 @@ const setMetrikaGoal = require('./utils/setMetrikaGoal');
 const setLike = require('./utils/setLike');
 const setServiceData = require('./utils/setServiceData');
 
-const redisClient = new Redis({
+const client = redis.createClient({
   host: 'localhost',
   port: 6379
 });
-const asyncGet = promisify(redisClient.get).bind(redisClient);
-const asyncSet = promisify(redisClient.set).bind(redisClient);
+const asyncGet = promisify(client.get).bind(client);
+const asyncSet = promisify(client.set).bind(client);
 
 const server = express();
 
@@ -69,9 +69,14 @@ server.put('/service', async (req, res) => {
   res.status(200).send(await setServiceData(req.body));
 });
 
-server.get('/clearCache', async (req, res) => {
-  await redisClient.flushall();
-  res.send('Кэш успешно сброшен');
+server.get('/clearCache', (req, res) => {
+  client.flushall((err, reply) => {
+    if (err) {
+      res.status(500).send('Ошибка при сбросе кэша');
+    } else {
+      res.send('Кэш успешно сброшен');
+    }
+  });
 });
 
 server.listen(3004, () => {
