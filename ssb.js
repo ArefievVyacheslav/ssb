@@ -38,7 +38,7 @@ function cacheMiddleware(req, res, next) {
 
 // Роут для удаления глобального кэша
 server.get('/clear-cache', (req, res) => {
-  client.flushall((err, succeeded) => {
+  client.flushdb((err, succeeded) => {
     if (err) {
       console.error('Ошибка при очистке кэша:', err);
       res.status(500).send('Ошибка при очистке кэша');
