@@ -38,13 +38,25 @@ function cacheMiddleware(req, res, next) {
 
 // Роут для удаления глобального кэша
 server.get('/clear-cache', (req, res) => {
-  client.flushdb((err, succeeded) => {
+  client.keys('*', (err, keys) => {
     if (err) {
-      console.error('Ошибка при очистке кэша:', err);
+      console.error('Ошибка при получении ключей из кэша:', err);
       res.status(500).send('Ошибка при очистке кэша');
     } else {
-      console.log('Глобальный кэш успешно очищен');
-      res.status(200).send('Глобальный кэш очищен');
+      if (keys.length > 0) {
+        client.del(keys, (err, count) => {
+          if (err) {
+            console.error('Ошибка при удалении ключей из кэша:', err);
+            res.status(500).send('Ошибка при очистке кэша');
+          } else {
+            console.log('Глобальный кэш успешно очищен');
+            res.status(200).send('Глобальный кэш очищен');
+          }
+        });
+      } else {
+        console.log('Кэш уже пуст');
+        res.status(200).send('Глобальный кэш пуст');
+      }
     }
   });
 });
