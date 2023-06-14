@@ -12,7 +12,10 @@ const setMetrikaGoal = require('./utils/setMetrikaGoal');
 const setLike = require('./utils/setLike');
 const setServiceData = require('./utils/setServiceData');
 
-const client = redis.createClient();
+const client = redis.createClient({
+  host: 'localhost',
+  port: 6379
+});
 const asyncGet = promisify(client.get).bind(client);
 const asyncSet = promisify(client.set).bind(client);
 
