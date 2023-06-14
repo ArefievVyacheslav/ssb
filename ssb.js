@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const Redis = require('ioredis');
+const { promisify } = require('util');
 
 const getSelects = require('./utils/getSelects');
 const getProducts = require('./utils/getProducts');
@@ -17,17 +18,20 @@ const redisClient = new Redis();
 server.use(cors());
 server.use(bodyParser.json());
 
+const asyncGet = promisify(redisClient.get).bind(redisClient);
+const asyncSet = promisify(redisClient.set).bind(redisClient);
+
 // Middleware для кэширования
 const cacheMiddleware = async (req, res, next) => {
   const key = req.baseUrl + req.path + JSON.stringify(req.body) + JSON.stringify(req.query);
   try {
-    const cachedData = await redisClient.get(key);
+    const cachedData = await asyncGet(key);
     if (cachedData) {
       res.send(cachedData);
     } else {
       res.sendResponse = res.send;
       res.send = async (body) => {
-        await redisClient.set(key, body);
+        await asyncSet(key, body);
         res.sendResponse(body);
       };
       next();
