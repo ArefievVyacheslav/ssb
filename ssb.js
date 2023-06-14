@@ -16,23 +16,22 @@ client.on('connect', () => {
 });
 
 // Middleware для кэширования
-function cacheMiddleware(req, res, next) {
+const cacheMiddleware = (req, res, next) => {
   const cacheKey = req.url;
-
   client.get(cacheKey, (err, data) => {
-    if (err) {
-      console.error('Ошибка при получении данных из кэша:', err);
-      next();
-    }
-
+    if (err) throw err;
     if (data !== null) {
-      console.log('Данные найдены в кэше');
       res.send(JSON.parse(data));
     } else {
+      res.sendResponse = res.send;
+      res.send = (body) => {
+        client.set(cacheKey, JSON.stringify(body));
+        res.sendResponse(body);
+      };
       next();
     }
   });
-}
+};
 
 app.post('/selects', cacheMiddleware, async (req, res) => {
   const cacheKey = req.url;
@@ -64,15 +63,18 @@ app.get('/sitemap', cacheMiddleware, async (req, res) => {
 
 app.get('/clear-cache', async (req, res) => {
   try {
-    const tempClient = redis.createClient();
-    await tempClient.flushdb();
-    console.log('Кэш успешно очищен');
-    res.status(200).send('Кэш успешно очищен');
+    client.flushdb((err, succeeded) => {
+      if (err) {
+        console.error('Ошибка при очистке кэша:', err);
+        res.status(500).send('Ошибка при очистке кэша');
+      } else {
+        console.log('Кэш успешно очищен');
+        res.status(200).send('Кэш успешно очищен');
+      }
+    });
   } catch (err) {
     console.error('Ошибка при очистке кэша:', err);
     res.status(500).send('Ошибка при очистке кэша');
-  } finally {
-    tempClient.quit();
   }
 });
 
