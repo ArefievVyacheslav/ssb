@@ -69,17 +69,11 @@ server.put('/service', async (req, res) => {
 const { exec } = require('child_process');
 
 server.get('/clearCache', (req, res) => {
-  client.flushall((err, reply) => {
-    if (err) {
+  exec('redis-cli FLUSHALL', (error, stdout, stderr) => {
+    if (error) {
       res.status(500).send('Ошибка при сбросе кэша');
     } else {
-      exec('redis-cli flushall', (error, stdout, stderr) => {
-        if (error) {
-          res.status(500).send('Ошибка при сбросе кэша');
-        } else {
-          res.send('Кэш успешно сброшен');
-        }
-      });
+      res.send('Кэш успешно сброшен');
     }
   });
 });
