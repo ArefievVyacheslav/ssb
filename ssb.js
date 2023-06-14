@@ -25,14 +25,14 @@ const cacheMiddleware = async (req, res, next) => {
   const client = redis.createClient({ host: 'localhost', port: 6379 });
 
   const key = req.baseUrl + req.path + JSON.stringify(req.body) + JSON.stringify(req.query);
-  const cachedData = await asyncGet.call(client, key);
+  const cachedData = await asyncGet(key);
 
   if (cachedData) {
     res.send(cachedData);
   } else {
     const originalSend = res.send;
     res.send = async (body) => {
-      await asyncSet.call(client, key, body);
+      await asyncSet(key, body);
       originalSend.call(res, body);
     };
     next();
