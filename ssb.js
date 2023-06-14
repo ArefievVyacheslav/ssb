@@ -18,6 +18,7 @@ const client = redis.createClient({
 });
 const asyncGet = promisify(client.get).bind(client);
 const asyncSet = promisify(client.set).bind(client);
+const asyncFlushall = promisify(client.flushall).bind(client);
 
 const server = express();
 
@@ -69,14 +70,9 @@ server.put('/service', async (req, res) => {
   res.status(200).send(await setServiceData(req.body));
 });
 
-server.get('/clearCache', (req, res) => {
-  client.flushall((err, reply) => {
-    if (err) {
-      res.status(500).send('Ошибка при сбросе кэша');
-    } else {
-      res.send('Кэш успешно сброшен');
-    }
-  });
+server.get('/clearCache', async (req, res) => {
+  await asyncFlushall();
+  res.send('Кэш успешно сброшен');
 });
 
 server.listen(3004, () => {
