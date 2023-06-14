@@ -17,7 +17,7 @@ server.use(bodyParser.json());
 
 // Middleware для кэширования
 const cacheMiddleware = (req, res, next) => {
-  const key = req.originalUrl;
+  const key = req.baseUrl + req.path + JSON.stringify(req.body) + JSON.stringify(req.query);
   const cachedData = cache.get(key);
 
   if (cachedData) {
