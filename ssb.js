@@ -63,8 +63,10 @@ server.put('/service', async (req, res) => {
 // Роут для сброса всего кэша
 server.get('/clearCache', (req, res) => {
   cache.flushAll();
+  res.setHeader('Cache-Control', 'no-store');
+  res.setHeader('Expires', '0');
   res.send('Кэш успешно сброшен');
-});
+})
 
 server.listen(3004, () => {
   console.log('ON 3004');
