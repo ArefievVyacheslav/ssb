@@ -1,66 +1,35 @@
-const express = require('express');
-const cors = require('cors');
-const bodyParser = require('body-parser');
-const redis = require('redis');
+const server = require('express')()
+const cors = require('cors')
+const bodyParser = require('body-parser')
+const getSelects = require('./utils/getSelects')
+const getProducts = require('./utils/getProducts')
+const getProduct = require('./utils/getProduct')
+const getSitemap = require('./utils/getSitemap')
+const setLike = require('./utils/setLike')
+const setServiceData = require('./utils/setServiceData')
 
-const app = express();
-const port = 3004;
 
-app.use(cors());
-app.use(bodyParser.json());
+server.use(cors())
+server.use(bodyParser.json())
 
-const client = redis.createClient();
+server.post('/selects', async (req, res) => {
+  res.status(200).send(await getSelects(req.body))
+})
+server.post('/products', async (req, res) => {
+  res.status(200).send(await getProducts(req.body))
+})
+server.post('/product', async (req, res) => {
+  res.status(200).send(await getProduct(req.body))
+})
+server.get('/sitemap', async (req, res) => {
+  res.status(200).send(await getSitemap())
+})
+server.post('/like', async (req, res) => {
+  res.status(200).send(await setLike(req.body))
+})
+server.put('/service', async (req, res) => {
+  res.status(200).send(await setServiceData(req.body))
+})
 
-client.on('connect', () => {
-  console.log('Подключено к Redis');
-});
 
-// Middleware для кэширования
-const cacheMiddleware = (req, res, next) => {
-  const cacheKey = req.url;
-  client.get(cacheKey, (err, data) => {
-    if (err) throw err;
-    if (data !== null) {
-      res.send(JSON.parse(data));
-    } else {
-      res.sendResponse = res.send;
-      res.send = (body) => {
-        client.set(cacheKey, JSON.stringify(body));
-        res.sendResponse(body);
-      };
-      next();
-    }
-  });
-};
-
-app.post('/selects', cacheMiddleware, async (req, res) => {
-  const cacheKey = req.url;
-  const data = await getSelects(req.body);
-  client.set(cacheKey, JSON.stringify(data)); // Кэширование навсегда
-  res.status(200).send(data);
-});
-
-app.post('/products', cacheMiddleware, async (req, res) => {
-  const cacheKey = req.url;
-  const data = await getProducts(req.body);
-  client.set(cacheKey, JSON.stringify(data)); // Кэширование навсегда
-  res.status(200).send(data);
-});
-
-app.post('/product', cacheMiddleware, async (req, res) => {
-  const cacheKey = req.url;
-  const data = await getProduct(req.body);
-  client.set(cacheKey, JSON.stringify(data)); // Кэширование навсегда
-  res.status(200).send(data);
-});
-
-app.get('/sitemap', cacheMiddleware, async (req, res) => {
-  const cacheKey = req.url;
-  const data = await getSitemap();
-  client.set(cacheKey, JSON.stringify(data)); // Кэширование навсегда
-  res.status(200).send(data);
-});
-
-app.listen(port, () => {
-  console.log(`Сервер запущен на порту ${port}`);
-});
+server.listen(3004, console.log('ON 3004'))
