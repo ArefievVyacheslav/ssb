@@ -63,20 +63,24 @@ app.get('/sitemap', cacheMiddleware, async (req, res) => {
 });
 
 app.get('/clear-cache', (req, res) => {
-  client.keys('*', (err, keys) => {
+  const tempClient = redis.createClient();
+
+  tempClient.keys('*', (err, keys) => {
     if (err) {
       console.error('Ошибка при получении ключей из кэша:', err);
       res.status(500).send('Ошибка при очистке кэша');
+      tempClient.quit();
       return;
     }
 
     if (keys.length === 0) {
       console.log('Кэш уже пустой');
       res.status(200).send('Кэш уже пустой');
+      tempClient.quit();
       return;
     }
 
-    client.del(keys, (err, count) => {
+    tempClient.del(keys, (err, count) => {
       if (err) {
         console.error('Ошибка при удалении ключей из кэша:', err);
         res.status(500).send('Ошибка при очистке кэша');
@@ -84,6 +88,7 @@ app.get('/clear-cache', (req, res) => {
         console.log('Кэш успешно очищен');
         res.status(200).send(`Удалено ${count} ключей из кэша`);
       }
+      tempClient.quit();
     });
   });
 });
