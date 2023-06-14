@@ -1,6 +1,8 @@
-const server = require('express')();
+const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
+const NodeCache = require('node-cache');
+
 const getSelects = require('./utils/getSelects');
 const getProducts = require('./utils/getProducts');
 const getProduct = require('./utils/getProduct');
@@ -8,8 +10,8 @@ const getSitemap = require('./utils/getSitemap');
 const setMetrikaGoal = require('./utils/setMetrikaGoal');
 const setLike = require('./utils/setLike');
 const setServiceData = require('./utils/setServiceData');
-const NodeCache = require('node-cache');
 
+const server = express();
 const cache = new NodeCache();
 
 server.use(cors());
