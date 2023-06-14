@@ -68,19 +68,11 @@ server.put('/service', async (req, res) => {
 
 // Роут для сброса всего кэша
 server.get('/clearCache', (req, res) => {
-  client.flushall((err, reply) => {
+  client.flushdb((err, reply) => {
     if (err) {
       res.status(500).send('Ошибка при сбросе кэша');
     } else {
-      // Выполняем команду для сброса кэша Redis через redis-cli
-      const { exec } = require('child_process');
-      exec('redis-cli flushall', (error, stdout, stderr) => {
-        if (error) {
-          res.status(500).send('Ошибка при сбросе кэша');
-        } else {
-          res.send('Кэш успешно сброшен');
-        }
-      });
+      res.send('Кэш успешно сброшен');
     }
   });
 });
