@@ -44,7 +44,11 @@ server.get('/clear-cache', (req, res) => {
       res.status(500).send('Ошибка при очистке кэша');
     } else {
       if (keys.length > 0) {
-        client.del(keys, (err, count) => {
+        const multi = client.multi();
+        keys.forEach((key) => {
+          multi.del(key);
+        });
+        multi.exec((err, replies) => {
           if (err) {
             console.error('Ошибка при удалении ключей из кэша:', err);
             res.status(500).send('Ошибка при очистке кэша');
