@@ -20,7 +20,7 @@ module.exports = async function getSelects(filtersObj) {
     console.log('Обработка селекта цен')
 
     console.log(new Date().toString())
-    const products = await db.collection(filtersObj.collection).find(filtersObj.findObj, {
+    const products = await db.collection(filtersObj.collection).find(filtersObj.findObj).project({
       subcategory: 1, subcategory_t: 1, brand: 1,
       price: 1,
       sale: 1,
