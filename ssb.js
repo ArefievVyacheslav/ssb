@@ -1,35 +1,87 @@
-const server = require('express')()
-const cors = require('cors')
-const bodyParser = require('body-parser')
-const getSelects = require('./utils/getSelects')
-const getProducts = require('./utils/getProducts')
-const getProduct = require('./utils/getProduct')
-const getSitemap = require('./utils/getSitemap')
-const setLike = require('./utils/setLike')
-const setServiceData = require('./utils/setServiceData')
+const express = require('express');
+const cors = require('cors');
+const bodyParser = require('body-parser');
+const cache = require('memory-cache');
 
+const getSelects = require('./utils/getSelects');
+const getProducts = require('./utils/getProducts');
+const getProduct = require('./utils/getProduct');
+const getSitemap = require('./utils/getSitemap');
+const setLike = require('./utils/setLike');
+const setServiceData = require('./utils/setServiceData');
 
-server.use(cors())
-server.use(bodyParser.json())
+const server = express();
+
+server.use(cors());
+server.use(bodyParser.json());
 
 server.post('/selects', async (req, res) => {
-  res.status(200).send(await getSelects(req.body))
-})
+  const cacheKey = 'selects';
+  const cachedResult = cache.get(cacheKey);
+  if (cachedResult) {
+    res.status(200).send(cachedResult);
+  } else {
+    const result = await getSelects(req.body);
+    cache.put(cacheKey, result);
+    res.status(200).send(result);
+  }
+});
+
 server.post('/products', async (req, res) => {
-  res.status(200).send(await getProducts(req.body))
-})
+  const cacheKey = 'products';
+  const cachedResult = cache.get(cacheKey);
+  if (cachedResult) {
+    res.status(200).send(cachedResult);
+  } else {
+    const result = await getProducts(req.body);
+    cache.put(cacheKey, result);
+    res.status(200).send(result);
+  }
+});
+
 server.post('/product', async (req, res) => {
-  res.status(200).send(await getProduct(req.body))
-})
+  const cacheKey = 'product_' + req.body.productId;
+  const cachedResult = cache.get(cacheKey);
+  if (cachedResult) {
+    res.status(200).send(cachedResult);
+  } else {
+    const result = await getProduct(req.body);
+    cache.put(cacheKey, result);
+    res.status(200).send(result);
+  }
+});
+
 server.get('/sitemap', async (req, res) => {
-  res.status(200).send(await getSitemap())
-})
+  const cacheKey = 'sitemap';
+  const cachedResult = cache.get(cacheKey);
+  if (cachedResult) {
+    res.status(200).send(cachedResult);
+  } else {
+    const result = await getSitemap();
+    cache.put(cacheKey, result);
+    res.status(200).send(result);
+  }
+});
+
 server.post('/like', async (req, res) => {
-  res.status(200).send(await setLike(req.body))
-})
+  const result = await setLike(req.body);
+  res.status(200).send(result);
+});
+
 server.put('/service', async (req, res) => {
-  res.status(200).send(await setServiceData(req.body))
-})
+  const result = await setServiceData(req.body);
+  res.status(200).send(result);
+});
 
+server.post('/clear-cache', (req, res) => {
+  clearCache();
+  res.status(200).send('Cache cleared');
+});
 
-server.listen(3004, console.log('ON 3004'))
+server.listen(3004, () => {
+  console.log('Server is running on port 3004');
+});
+
+function clearCache() {
+  cache.clear();
+}
