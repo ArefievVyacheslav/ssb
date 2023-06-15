@@ -16,7 +16,7 @@ server.use(cors());
 server.use(bodyParser.json());
 
 server.post('/selects', async (req, res) => {
-  const cacheKey = 'selects';
+  const cacheKey = JSON.stringify({ route: 'selects', params: req.body });
   const cachedResult = cache.get(cacheKey);
   if (cachedResult) {
     res.status(200).send(cachedResult);
@@ -28,7 +28,7 @@ server.post('/selects', async (req, res) => {
 });
 
 server.post('/products', async (req, res) => {
-  const cacheKey = 'products';
+  const cacheKey = JSON.stringify({ route: 'products', params: req.body });
   const cachedResult = cache.get(cacheKey);
   if (cachedResult) {
     res.status(200).send(cachedResult);
@@ -40,7 +40,7 @@ server.post('/products', async (req, res) => {
 });
 
 server.post('/product', async (req, res) => {
-  const cacheKey = 'product_' + req.body.productId;
+  const cacheKey = JSON.stringify({ route: 'product', params: req.body });
   const cachedResult = cache.get(cacheKey);
   if (cachedResult) {
     res.status(200).send(cachedResult);
@@ -73,7 +73,7 @@ server.put('/service', async (req, res) => {
   res.status(200).send(result);
 });
 
-server.post('/clear-cache', (req, res) => {
+server.get('/clear-cache', (req, res) => {
   clearCache();
   res.status(200).send('Cache cleared');
 });
