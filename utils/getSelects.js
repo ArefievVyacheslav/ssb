@@ -17,9 +17,14 @@ module.exports = async function getSelects(filtersObj) {
       filtersObj.findObj.price[ '$in' ] = [...Array.from(Array(+endPrice - +startPrice + 1).keys(),x => x + +startPrice)]
     }
     console.log(new Date().toString())
+    console.log('Обработка селекта цен')
 
+    console.log(new Date().toString())
     const products = await db.collection(filtersObj.collection).find(filtersObj.findObj).toArray()
+    console.log(new Date().toString())
+    console.log('Поиск товаров')
 
+    console.log(new Date().toString())
     const subCat = unique(products.map(productObj => ({
       subcategory: productObj.subcategory,
       subcategory_t: productObj.subcategory_t,
@@ -27,6 +32,8 @@ module.exports = async function getSelects(filtersObj) {
       subCat.subcategory_t.replaceAll(' ', '-')
       return subCat
     })
+    console.log(new Date().toString())
+    console.log('Подготовка подкатегорий')
 
     const result = { subCat,brand:[],brandCountry:[],color:[],country:[],price:[],sale:[],season:[],shop:[],style:[] }
 
