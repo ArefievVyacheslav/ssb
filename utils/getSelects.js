@@ -4,12 +4,10 @@ const client = new MongoClient('mongodb://localhost:27017')
 
 const unique = (array, propertyName) => array.filter((e, i) => array.findIndex(a => a[propertyName] === e[propertyName]) === i)
 
-let collection = null
-let products = []
 
 module.exports = async function getSelects(filtersObj) {
   try {
-    const startDate = new Date()
+    const startTime = new Date()
     await client.connect()
     const db = await client.db('ss')
 
@@ -19,11 +17,7 @@ module.exports = async function getSelects(filtersObj) {
       filtersObj.findObj.price[ '$in' ] = [...Array.from(Array(+endPrice - +startPrice + 1).keys(),x => x + +startPrice)]
     }
 
-    if (!products.length && collection !== filtersObj.collection) products = await db.collection(filtersObj.collection)
-    collection = filtersObj.collection
-
-
-    const productsFiltered = products.find(filtersObj.findObj).project({
+    const products = await db.collection(filtersObj.collection).find(filtersObj.findObj).project({
       subcategory: 1, subcategory_t: 1, brand: 1,
       price: 1,
       sale: 1,
@@ -36,41 +30,19 @@ module.exports = async function getSelects(filtersObj) {
       style: 1, style_t: 1
     }).toArray()
 
-    // const productsFiltered = products.reduce((acc, product) => {
-    //   if (filtersObj.findObj.brand && filtersObj.findObj.brand.$in.includes(product.brand)) acc.push(product)
-    //   if (filtersObj.findObj.country && filtersObj.findObj.country.$in.includes(product.country)) acc.push(product)
-    //   if (filtersObj.findObj.delivery && product.delivery.some(country => filtersObj.findObj.delivery.$in.includes(country))) acc.push(product)
-    //   if (filtersObj.findObj.gender && product.gender === filtersObj.findObj.gender) acc.push(product)
-    //   if (filtersObj.findObj.installment && filtersObj.findObj.installment === true ? filtersObj.findObj.installment === product.installment : true) acc.push(product)
-    //   if (filtersObj.findObj.price && product.price >= filtersObj.findObj.price.$in[0] && product.price <= filtersObj.findObj.price.$in[1]) acc.push(product)
-    //   if (filtersObj.findObj.sale && product.sale > filtersObj.findObj.sale.$gt) acc.push(product)
-    //   if (filtersObj.findObj.season && filtersObj.findObj.season.$in.includes(product.season)) acc.push(product)
-    //   if (filtersObj.findObj.shop && ffiltersObj.findObj.shop.$in.includes(product.shop)) acc.push(product)
-    //   if (filtersObj.findObj.sizes && product.sizes.some(size => filtersObj.findObj.sizes.$in.includes(size))) acc.push(product)
-    //   if (filtersObj.findObj.style && filtersObj.findObj.style.$in.includes(product.style)) acc.push(product)
-    //   if (filtersObj.findObj.subcategory && filtersObj.findObj.subcategory.$in.includes(product.subcategory)) acc.push(product)
-    //
-    //   return acc
-    // }, [])
-    //
-    //   .filter(product => filtersObj.findObj.style.$in.includes(product.style))
-    //   .filter(product => filtersObj.findObj.subcategory.$in.includes(product.subcategory))
+    console.log('Товары найдены за ' + (startTime - new Date()) / 1000 + 'sec.')
 
-
-    console.log((new Date() - startDate) / 1000, 's', 'Поиск товаров')
-
-    const subCat = unique(productsFiltered.map(productObj => ({
+    const subCat = unique(products.map(productObj => ({
       subcategory: productObj.subcategory,
       subcategory_t: productObj.subcategory_t,
     })), 'subcategory').map(subCat => {
       subCat.subcategory_t.replaceAll(' ', '-')
       return subCat
     })
-    console.log((new Date() - startDate) / 1000, 's', 'Подготовка подкатегорий')
 
     const result = { subCat,brand:[],brandCountry:[],color:[],country:[],price:[],sale:[],season:[],shop:[],style:[] }
 
-    productsFiltered.forEach(productObj => {
+    products.map(productObj => {
       if (!result.brand.includes(productObj.brand.toUpperCase())) result.brand.push(productObj.brand.toUpperCase())
       if (!result.price.includes(productObj.price)) result.price.push(productObj.price)
       if (!result.sale.includes(productObj.sale)) result.sale.push(productObj.sale)
