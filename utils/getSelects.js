@@ -30,7 +30,7 @@ module.exports = async function getSelects(filtersObj) {
       country: 1, country_t: 1,
       season: 1, season_t: 1,
       style: 1, style_t: 1
-    }).toArray()
+    })
     collection = filtersObj.collection
 
 
