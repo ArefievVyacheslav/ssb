@@ -19,7 +19,11 @@ module.exports = async function getSelects(filtersObj) {
       filtersObj.findObj.price[ '$in' ] = [...Array.from(Array(+endPrice - +startPrice + 1).keys(),x => x + +startPrice)]
     }
 
-    if (!products.length && collection !== filtersObj.collection) products = await db.collection(filtersObj.collection).find({}).project({
+    if (!products.length && collection !== filtersObj.collection) products = await db.collection(filtersObj.collection)
+    collection = filtersObj.collection
+
+
+    const productsFiltered = products.find(filtersObj.findObj).project({
       subcategory: 1, subcategory_t: 1, brand: 1,
       price: 1,
       sale: 1,
@@ -30,11 +34,7 @@ module.exports = async function getSelects(filtersObj) {
       country: 1, country_t: 1,
       season: 1, season_t: 1,
       style: 1, style_t: 1
-    })
-    collection = filtersObj.collection
-
-
-    const productsFiltered = products.find(filtersObj.findObj).toArray()
+    }).toArray()
 
     // const productsFiltered = products.reduce((acc, product) => {
     //   if (filtersObj.findObj.brand && filtersObj.findObj.brand.$in.includes(product.brand)) acc.push(product)
@@ -70,7 +70,7 @@ module.exports = async function getSelects(filtersObj) {
 
     const result = { subCat,brand:[],brandCountry:[],color:[],country:[],price:[],sale:[],season:[],shop:[],style:[] }
 
-    products.forEach(productObj => {
+    productsFiltered.forEach(productObj => {
       if (!result.brand.includes(productObj.brand.toUpperCase())) result.brand.push(productObj.brand.toUpperCase())
       if (!result.price.includes(productObj.price)) result.price.push(productObj.price)
       if (!result.sale.includes(productObj.sale)) result.sale.push(productObj.sale)
