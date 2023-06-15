@@ -33,7 +33,20 @@ module.exports = async function getSelects(filtersObj) {
     }).toArray()
     collection = filtersObj.collection
 
-    console.log(filtersObj.findObj, '============================================================================')
+
+    const productsFiltered = products
+      .filter(product => filtersObj.findObj.brand.$in.includes(product.brand))
+      .filter(product => filtersObj.findObj.country.$in.includes(product.country))
+      .filter(product => product.delivery.some(country => filtersObj.findObj.delivery.$in.includes(country)))
+      .filter(product => product.gender === filtersObj.findObj.gender)
+      .filter(product => filtersObj.findObj.installment === true ? filtersObj.findObj.installment === product.installment : true)
+      .filter(product => product.price >= filtersObj.findObj.price.$in[0] && product.price <= filtersObj.findObj.price.$in[1])
+      .filter(product => product.sale > filtersObj.findObj.sale.$gt)
+      .filter(product => filtersObj.findObj.season.$in.includes(product.season))
+      .filter(product => filtersObj.findObj.shop.$in.includes(product.shop))
+      .filter(product => product.sizes.some(size => filtersObj.findObj.sizes.$in.includes(size)))
+      .filter(product => filtersObj.findObj.style.$in.includes(product.style))
+      .filter(product => filtersObj.findObj.subcategory.$in.includes(product.subcategory))
 
 
     console.log((new Date() - startDate) / 1000, 's', 'Поиск товаров')
@@ -49,7 +62,7 @@ module.exports = async function getSelects(filtersObj) {
 
     const result = { subCat,brand:[],brandCountry:[],color:[],country:[],price:[],sale:[],season:[],shop:[],style:[] }
 
-    products.forEach(productObj => {
+    productsFiltered.forEach(productObj => {
       if (!result.brand.includes(productObj.brand.toUpperCase())) result.brand.push(productObj.brand.toUpperCase())
       if (!result.price.includes(productObj.price)) result.price.push(productObj.price)
       if (!result.sale.includes(productObj.sale)) result.sale.push(productObj.sale)
