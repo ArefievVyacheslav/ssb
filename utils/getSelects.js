@@ -33,11 +33,7 @@ module.exports = async function getSelects(filtersObj) {
     }).toArray()
     collection = filtersObj.collection
 
-    const filterJS = Object.keys(filtersObj.findObj).reduce((acc, key) => {
-      if (typeof filtersObj.findObj[key] === 'string' || typeof filtersObj.findObj[key] === 'boolean') acc[key] = filtersObj.findObj[key]
-      else acc[key] = filtersObj.findObj[key]['$in']
-    }, {})
-    console.log(filterJS, '============================================================================')
+    console.log(filtersObj.findObj, '============================================================================')
 
 
     console.log((new Date() - startDate) / 1000, 's', 'Поиск товаров')
