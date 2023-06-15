@@ -13,7 +13,21 @@ module.exports = async function getSelects(filtersObj) {
       filtersObj.findObj.price[ '$in' ] = [...Array.from(Array(+endPrice - +startPrice + 1).keys(),x => x + +startPrice)]
     }
 
-    const products = await db.collection(filtersObj.collection).find(filtersObj.findObj).sort(filtersObj.sortObj).toArray()
+    const products = await db.collection(filtersObj.collection).find(filtersObj.findObj).project({
+      id: 1,
+      brand: 1,
+      category_t: 1,
+      color: 1,
+      like: 1,
+      link: 1,
+      name: 1,
+      images: 1,
+      oldprice: 1,
+      price: 1,
+      sale: 1,
+      shop: 1,
+      sizes: 1
+    }).sort(filtersObj.sortObj).toArray()
 
     const productsTotal = products.map(productObj => ({
       id: productObj.id,
