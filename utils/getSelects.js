@@ -4,6 +4,7 @@ const client = new MongoClient('mongodb://localhost:27017')
 
 const unique = (array, propertyName) => array.filter((e, i) => array.findIndex(a => a[propertyName] === e[propertyName]) === i)
 
+let collection = null
 let products = []
 
 module.exports = async function getSelects(filtersObj) {
@@ -18,7 +19,7 @@ module.exports = async function getSelects(filtersObj) {
       filtersObj.findObj.price[ '$in' ] = [...Array.from(Array(+endPrice - +startPrice + 1).keys(),x => x + +startPrice)]
     }
 
-    if (!products.length) products = await db.collection(filtersObj.collection).find(filtersObj.findObj).project({
+    if (!products.length && collection !== filtersObj.collection) products = await db.collection(filtersObj.collection).find(filtersObj.findObj).project({
       subcategory: 1, subcategory_t: 1, brand: 1,
       price: 1,
       sale: 1,
@@ -30,9 +31,10 @@ module.exports = async function getSelects(filtersObj) {
       season: 1, season_t: 1,
       style: 1, style_t: 1
     }).toArray()
+    collection = filtersObj.collection
 
     const filterJS = Object.keys(filtersObj.findObj).reduce((acc, key) => {
-      if (typeof key === 'string' || typeof key === 'boolean') acc[key] = filtersObj.findObj[key]
+      if (typeof filtersObj.findObj[key] === 'string' || typeof filtersObj.findObj[key] === 'boolean') acc[key] = filtersObj.findObj[key]
       else acc[key] = filtersObj.findObj[key]['$in']
     }, {})
     console.log(filterJS, '============================================================================')
