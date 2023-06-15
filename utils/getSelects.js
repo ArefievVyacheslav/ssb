@@ -59,7 +59,7 @@ module.exports = async function getSelects(filtersObj) {
 
     console.log((new Date() - startDate) / 1000, 's', 'Поиск товаров')
 
-    const subCat = unique(products.map(productObj => ({
+    const subCat = unique(productsFiltered.map(productObj => ({
       subcategory: productObj.subcategory,
       subcategory_t: productObj.subcategory_t,
     })), 'subcategory').map(subCat => {
