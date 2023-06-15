@@ -31,6 +31,7 @@ module.exports = async function getSelects(filtersObj) {
       season: 1, season_t: 1,
       style: 1, style_t: 1
     }).toArray()
+    console.log(products[ 0 ])
     console.log(new Date().toString())
     console.log('Поиск товаров')
 
