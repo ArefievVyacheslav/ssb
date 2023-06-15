@@ -4,22 +4,21 @@ const client = new MongoClient('mongodb://localhost:27017')
 
 const unique = (array, propertyName) => array.filter((e, i) => array.findIndex(a => a[propertyName] === e[propertyName]) === i)
 
+let products = []
 
 module.exports = async function getSelects(filtersObj) {
   try {
+    const startDate = new Date()
     await client.connect()
     const db = await client.db('ss')
 
-    const startDate = new Date()
-    console.log(startDate)
     if (filtersObj.findObj?.price) {
       const startPrice = filtersObj.findObj.price[ '$in' ][0]
       const endPrice = filtersObj.findObj.price[ '$in' ][1]
       filtersObj.findObj.price[ '$in' ] = [...Array.from(Array(+endPrice - +startPrice + 1).keys(),x => x + +startPrice)]
     }
-    console.log((new Date() - startDate) / 1000, 's', 'Обработка селекта цен')
 
-    const products = await db.collection(filtersObj.collection).find(filtersObj.findObj).project({
+    if (!products.length) products = await db.collection(filtersObj.collection).find(filtersObj.findObj).project({
       subcategory: 1, subcategory_t: 1, brand: 1,
       price: 1,
       sale: 1,
@@ -31,6 +30,14 @@ module.exports = async function getSelects(filtersObj) {
       season: 1, season_t: 1,
       style: 1, style_t: 1
     }).toArray()
+
+    const filterJS = Object.keys(filtersObj.findObj).reduce((acc, key) => {
+      if (typeof key === 'string' || typeof key === 'boolean') acc[key] = filtersObj.findObj[key]
+      else acc[key] = filtersObj.findObj[key]['$in']
+    }, {})
+    console.log(filterJS, '============================================================================')
+
+
     console.log((new Date() - startDate) / 1000, 's', 'Поиск товаров')
 
     const subCat = unique(products.map(productObj => ({
@@ -44,7 +51,7 @@ module.exports = async function getSelects(filtersObj) {
 
     const result = { subCat,brand:[],brandCountry:[],color:[],country:[],price:[],sale:[],season:[],shop:[],style:[] }
 
-    products.map(productObj => {
+    products.forEach(productObj => {
       if (!result.brand.includes(productObj.brand.toUpperCase())) result.brand.push(productObj.brand.toUpperCase())
       if (!result.price.includes(productObj.price)) result.price.push(productObj.price)
       if (!result.sale.includes(productObj.sale)) result.sale.push(productObj.sale)
