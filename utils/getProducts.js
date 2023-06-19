@@ -29,31 +29,14 @@ module.exports = async function getProducts(filtersObj) {
       sizes: 1
     }).sort(filtersObj.sortObj).toArray()
 
-    const productsTotal = products.map(productObj => ({
-      id: productObj.id,
-      brand: productObj.brand,
-      category_t: productObj.category_t,
-      collection: filtersObj.collection,
-      color: productObj.color,
-      like: productObj.like,
-      link: productObj.link,
-      name: productObj.name,
-      images: productObj.images[0],
-      oldprice: productObj.oldprice,
-      price: productObj.price,
-      sale: productObj.sale,
-      shop: productObj.shop,
-      sizes: productObj.sizes
-    }))
-
     const result = []
     const count = +filtersObj.pagination.show || 60
-    for (let s = 0, e = count; s < productsTotal.length; s += count, e += count)
-      result.push(productsTotal.slice(s, +e))
+    for (let s = 0, e = count; s < products.length; s += count, e += count)
+      result.push(products.slice(s, +e))
 
     return {
       products: result[+filtersObj.pagination.page - 1 || 0],
-      quantity: productsTotal.length
+      quantity: products.length
     }
   } catch (e) {
     console.log(e);
