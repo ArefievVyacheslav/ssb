@@ -35,7 +35,7 @@ module.exports = async function getProducts(filtersObj) {
       result.push(products.slice(s, +e))
 
     return {
-      products: result[+filtersObj.pagination.page - 1 || 0],
+      products: result[+filtersObj.pagination.page - 1 || 0].map(prod => ({ ...prod, collection: filtersObj.collection })),
       quantity: products.length
     }
   } catch (e) {
