@@ -13,6 +13,7 @@ module.exports = async function setServiceData(serviceDataObj) {
       { $set: { userBrands: [ ...new Set([ ...userActiveData.userBrands, ...serviceDataObj.userBrands ]) ].sort() } }
     )
     else await collection.insertOne({ userBrands: serviceDataObj.userBrands.sort() })
+    await client.close()
     return {
       type: 'success',
       msg: 'Ваше предложение по добавлению брендов успешно записано.'

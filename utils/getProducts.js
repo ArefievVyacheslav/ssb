@@ -33,7 +33,7 @@ module.exports = async function getProducts(filtersObj) {
     const count = +filtersObj.pagination.show || 60
     for (let s = 0, e = count; s < products.length; s += count, e += count)
       result.push(products.slice(s, +e))
-
+    await client.close()
     return {
       products: result[+filtersObj.pagination.page - 1 || 0].map(prod => ({ ...prod, collection: filtersObj.collection })),
       quantity: products.length

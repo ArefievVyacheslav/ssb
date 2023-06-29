@@ -16,6 +16,7 @@ module.exports = async function getSitemap () {
       })
     }
     await writeFileSync('../ssf/static/sitemap.txt', sitemap.reduce((acc, link) => acc += 'https://sales-search.ru' + link + '\n', ''), 'utf-8', (err) => {})
+    await client.close()
     return sitemap
   } catch (e) {
     console.log(e)

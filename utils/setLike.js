@@ -12,5 +12,6 @@ module.exports = async function setLike(productObj) {
       { id: productObj.id },
       { $set: { like: product.like + 1 } }
     )
+    await client.close()
   } catch (e) {}
 }

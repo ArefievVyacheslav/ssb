@@ -7,6 +7,8 @@ const getSelects = require('./utils/getSelects');
 const getProducts = require('./utils/getProducts');
 const getProduct = require('./utils/getProduct');
 const getSitemap = require('./utils/getSitemap');
+const getSearchResults = require('./utils/getSearchResults');
+const saveEmail = require('./utils/saveEmail');
 const setLike = require('./utils/setLike');
 const setServiceData = require('./utils/setServiceData');
 
@@ -88,6 +90,35 @@ async function connectToDatabase() {
         res.status(500).send(error);
       }
     });
+
+    server.post('/search', async (req, res) => {
+      try {
+        const searchTerm = req.body.searchTerm; // Получаем поисковый запрос из параметров запроса
+
+        const cacheKey = JSON.stringify({ route: 'search', query: searchTerm });
+        const cachedResult = await collection.findOne({ _id: cacheKey });
+
+        if (cachedResult) {
+          res.status(200).send(cachedResult.data);
+        } else {
+          const result = await getSearchResults(searchTerm); // Используйте соответствующую функцию для выполнения поиска
+          await collection.insertOne({ _id: cacheKey, data: result });
+          res.status(200).send(result);
+        }
+      } catch (error) {
+        res.status(500).send(error);
+      }
+    })
+
+    server.post('/subscribe', async (req, res) => {
+      try {
+        const email = req.body.email; // Получаем адрес электронной почты из параметров запроса
+        await saveEmail(email);
+        res.status(200).send('Email subscribed successfully');
+      } catch (error) {
+        res.status(500).send(error);
+      }
+    })
 
     server.post('/like', async (req, res) => {
       try {

@@ -70,15 +70,25 @@ module.exports = async function getSelects(filtersObj) {
     result.price = [ result.price[ 0 ], result.price[ result.price.length - 1 ] ]
     result.sale = [ Math.min(...result.sale) - 1, Math.max(...result.sale) - 1 ]
 
-    const weights = { 'XXXS':-1, 'XXS':0, 'XXS/XS':1, 'XS':2, 'XS/S':3, 'S':4, 'S/M':5, 'M':6, 'M/L':7, 'L':8, 'L/XL':8.5, 'XL':9, 'XXL':10, 'XXXL':11, 'XXXXL':12 }
     let size = [ ...new Set(products.map(productObj => productObj.sizes).flat(Infinity)) ]
-    size = size.sort((a, b) => {
-      if (!isNaN(a) && !isNaN(b)) return a - b
-    })
-    result.size = [ ...size.filter(el => isNaN(el)).sort((a, b) => {
-      if (isNaN(a) && isNaN(b)) return weights[a] - weights[b]
-    }), ...size.filter(el => el && !isNaN(el)).sort( (a, b) => a.localeCompare(b, undefined, { numeric:true }) ) ]
+    const order = [ /^one size$/, /^XXS$/, /^XS$/, /^S$/, /^S-M$/, /^M$/, /^M-L$/, /^L$/, /^L-XL$/, /^XL$/, /^XXL$/, /^2XL$/, /^3XL$/, /^XXXL$/, /^4XL$/, /^5XL$/, /^6XL$/, /^W\d+/, /^\d+\/\d+$/, /^\d+$/, /^\d+.\d+$/, /^\d+-\d+$/ ];
 
+    function compareSizes(a, b) {
+      const aIndex = order.findIndex(regex => regex.test(a));
+      const bIndex = order.findIndex(regex => regex.test(b));
+
+      if (aIndex === -1 && bIndex === -1) {
+        return a.localeCompare(b);
+      } else if (aIndex === -1) {
+        return 1;
+      } else if (bIndex === -1) {
+        return -1;
+      }
+
+      return aIndex - bIndex;
+    }
+    result.size = size.sort(compareSizes)
+    await client.close()
     return result
   } catch (e) {
     console.log(e);
