@@ -1,27 +1,29 @@
 const { MongoClient } = require('mongodb');
 const client = new MongoClient('mongodb://localhost:27017');
-const DATABASE_NAME = 'mydatabase';
 
 module.exports = async function getSearchResults(searchTerm) {
   try {
     await client.connect();
-    const db = client.db(DATABASE_NAME);
-    const collections = ['clothes', 'shoes', 'accessories'];
-    const results = [];
+    const db = await client.db('ss');
+    const clothes = await db.collection('clothes').find({ $text: { $search: searchTerm } })
+      .project({ score: { $meta: 'textScore' } })
+      .sort({ score: { $meta: 'textScore' } })
+      .toArray() || [];
 
-    for (const collectionName of collections) {
-      const collection = db.collection(collectionName);
-      const result = await collection.find({ $text: { $search: `"${searchTerm}"` } }).toArray();
-      results.push(...result);
-    }
+    const shoes = await db.collection('shoes').find({ $text: { $search: searchTerm } })
+      .project({ score: { $meta: 'textScore' } })
+      .sort({ score: { $meta: 'textScore' } })
+      .toArray() || [];
 
-    console.log(results);
-    return results;
+    const accessories = await db.collection('accessories').find({ $text: { $search: searchTerm } })
+      .project({ score: { $meta: 'textScore' } })
+      .sort({ score: { $meta: 'textScore' } })
+      .toArray() || [];
+
+    client.close();
+    return [...clothes, ...shoes, ...accessories];
   } catch (error) {
     console.error('Failed to get search results:', error);
     throw error;
-  } finally {
-    client.close();
-    console.log('Отключено от MongoDB');
   }
-};
+}
