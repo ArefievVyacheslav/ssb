@@ -1,10 +1,11 @@
 const { MongoClient } = require('mongodb');
 const client = new MongoClient('mongodb://localhost:27017');
+const DATABASE_NAME = 'mydatabase';
 
 module.exports = async function getSearchResults(searchTerm) {
   try {
     await client.connect();
-    const db = await client.db('mydatabase');
+    const db = client.db(DATABASE_NAME);
     const collections = ['clothes', 'shoes', 'accessories'];
     const results = [];
 
@@ -21,6 +22,6 @@ module.exports = async function getSearchResults(searchTerm) {
     throw error;
   } finally {
     client.close();
-    console.log('Disconnected from MongoDB');
+    console.log('Отключено от MongoDB');
   }
 };
