@@ -8,22 +8,26 @@ module.exports = async function getSearchResults(searchTerm) {
     const clothes = await db.collection('clothes').find({ $text: { $search: searchTerm } })
       .project({ score: { $meta: 'textScore' } })
       .sort({ score: { $meta: 'textScore' } })
+      .limit(300)
       .toArray() || [];
 
     const shoes = await db.collection('shoes').find({ $text: { $search: searchTerm } })
       .project({ score: { $meta: 'textScore' } })
       .sort({ score: { $meta: 'textScore' } })
+      .limit(300)
       .toArray() || [];
 
     const accessories = await db.collection('accessories').find({ $text: { $search: searchTerm } })
       .project({ score: { $meta: 'textScore' } })
       .sort({ score: { $meta: 'textScore' } })
+      .limit(300)
       .toArray() || [];
 
-    client.close();
     return [...clothes, ...shoes, ...accessories];
   } catch (error) {
     console.error('Failed to get search results:', error);
     throw error;
+  } finally {
+    client.close();
   }
 }
