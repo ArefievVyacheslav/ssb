@@ -23,7 +23,8 @@ module.exports = async function getSearchResults(searchTerm) {
       price: product.price,
       sale: product.sale,
       shop: product.shop,
-      sizes: product.sizes
+      sizes: product.sizes,
+      score: product.score
     }))
 
     let shoes = await db.collection('shoes').find({ $text: { $search: searchTerm } })
@@ -44,7 +45,8 @@ module.exports = async function getSearchResults(searchTerm) {
       price: product.price,
       sale: product.sale,
       shop: product.shop,
-      sizes: product.sizes
+      sizes: product.sizes,
+      score: product.score
     }))
 
     let accessories = await db.collection('accessories').find({ $text: { $search: searchTerm } })
@@ -65,7 +67,8 @@ module.exports = async function getSearchResults(searchTerm) {
       price: product.price,
       sale: product.sale,
       shop: product.shop,
-      sizes: product.sizes
+      sizes: product.sizes,
+      score: product.score
     }))
 
     const allResults = [...clothes, ...shoes, ...accessories];
