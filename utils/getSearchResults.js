@@ -5,22 +5,31 @@ module.exports = async function getSearchResults(searchTerm) {
   try {
     await client.connect();
     const db = await client.db('ss');
-    const clothes = await db.collection('clothes').find({ $text: { $search: searchTerm } })
-      .project({ score: { $meta: 'textScore' } })
-      .sort({ score: { $meta: 'textScore' } })
-      .toArray() || [];
 
-    const shoes = await db.collection('shoes').find({ $text: { $search: searchTerm } })
-      .project({ score: { $meta: 'textScore' } })
-      .sort({ score: { $meta: 'textScore' } })
-      .toArray() || [];
+    const pipeline = [
+      {
+        $search: {
+          index: 'name_text', // Replace with the name of your text search index
+          text: {
+            query: searchTerm,
+            path: ['name', 'subcategory', 'description', 'gender', 'brand', 'color'] // Fields to search in
+          }
+        }
+      },
+      {
+        $project: {
+          score: { $meta: 'searchScore' },
+          data: '$$ROOT'
+        }
+      },
+      {
+        $sort: { score: -1 } // Sort by search score in descending order
+      }
+    ];
 
-    const accessories = await db.collection('accessories').find({ $text: { $search: searchTerm } })
-      .project({ score: { $meta: 'textScore' } })
-      .sort({ score: { $meta: 'textScore' } })
-      .toArray() || [];
+    const result = await db.collection('clothes').aggregate(pipeline).toArray();
 
-    return [...clothes, ...shoes, ...accessories];
+    return result;
   } catch (error) {
     console.error('Failed to get search results:', error);
     throw error;
