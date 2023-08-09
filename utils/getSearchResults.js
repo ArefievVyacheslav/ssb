@@ -27,7 +27,7 @@ module.exports = async function getSearchResults(searchTerm) {
       }
     ];
 
-    const result = await db.collection('clothes').aggregate(pipeline).toArray();
+    const result = await db.collection('shoes').aggregate(pipeline).toArray();
 
     return result;
   } catch (error) {
