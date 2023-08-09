@@ -5,10 +5,11 @@ module.exports = async function getSearchResults(searchTerm) {
   try {
     await client.connect();
     const db = await client.db('ss');
-    const clothes = await db.collection('clothes').find({ $text: { $search: searchTerm } })
+    let clothes = await db.collection('clothes').find({ $text: { $search: searchTerm } })
       .project({ score: { $meta: 'textScore' } })
       .sort({ score: { $meta: 'textScore' } })
-      .toArray().map(product => ({
+      .toArray() || [];
+    clothes = clothes.map(product => ({
       id: product.id,
       brand: product.brand,
       category_t: product.category_t,
@@ -23,12 +24,13 @@ module.exports = async function getSearchResults(searchTerm) {
       sale: product.sale,
       shop: product.shop,
       sizes: product.sizes
-    })) || [];
+    }))
 
-    const shoes = await db.collection('shoes').find({ $text: { $search: searchTerm } })
+    let shoes = await db.collection('shoes').find({ $text: { $search: searchTerm } })
       .project({ score: { $meta: 'textScore' } })
       .sort({ score: { $meta: 'textScore' } })
-      .toArray().map(product => ({
+      .toArray() || [];
+    shoes = shoes.map(product => ({
       id: product.id,
       brand: product.brand,
       category_t: product.category_t,
@@ -43,12 +45,13 @@ module.exports = async function getSearchResults(searchTerm) {
       sale: product.sale,
       shop: product.shop,
       sizes: product.sizes
-    })) || [];
+    }))
 
-    const accessories = await db.collection('accessories').find({ $text: { $search: searchTerm } })
+    let accessories = await db.collection('accessories').find({ $text: { $search: searchTerm } })
       .project({ score: { $meta: 'textScore' } })
       .sort({ score: { $meta: 'textScore' } })
-      .toArray().map(product => ({
+      .toArray() || []
+    accessories = accessories.map(product => ({
       id: product.id,
       brand: product.brand,
       category_t: product.category_t,
@@ -63,7 +66,7 @@ module.exports = async function getSearchResults(searchTerm) {
       sale: product.sale,
       shop: product.shop,
       sizes: product.sizes
-    })) || [];
+    }))
 
     const allResults = [...clothes, ...shoes, ...accessories];
 
