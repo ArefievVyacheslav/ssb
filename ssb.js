@@ -3,6 +3,7 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const { MongoClient } = require('mongodb');
 
+const getBrands = require('./utils/getBrands')
 const getSelects = require('./utils/getSelects');
 const getProducts = require('./utils/getProducts');
 const getProduct = require('./utils/getProduct');
@@ -30,6 +31,15 @@ async function connectToDatabase() {
 
     const database = client.db(DATABASE_NAME);
     const collection = database.collection(COLLECTION_NAME);
+
+    server.get('/brands', async (req, res) => {
+      try {
+        const brands = await getBrands();
+        res.status(200).send(brands);
+      } catch (error) {
+        res.status(500).send(error);
+      }
+    });
 
     server.post('/selects', async (req, res) => {
       try {
