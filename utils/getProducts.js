@@ -25,9 +25,21 @@ module.exports = async function getProducts(filtersObj) {
         .toArray();
     } else {
       products = await Promise.all([
-        db.collection('clothes').find(filtersObj.findObj).toArray(),
-        db.collection('shoes').find(filtersObj.findObj).toArray(),
-        db.collection('accessories').find(filtersObj.findObj).toArray()
+        db.collection('clothes').find(filtersObj.findObj).project({
+          id: 1, brand: 1, collection: 'clothes', category_t: 1, color: 1, like: 1, link: 1, name: 1, images: 1,
+          oldprice: 1, price: 1, sale: 1, shop: 1, sizes: 1
+        })
+        .sort(filtersObj.sortObj).toArray(),
+        db.collection('shoes').find(filtersObj.findObj).project({
+          id: 1, brand: 1, collection: 'shoes', category_t: 1, color: 1, like: 1, link: 1, name: 1, images: 1,
+          oldprice: 1, price: 1, sale: 1, shop: 1, sizes: 1
+        })
+        .sort(filtersObj.sortObj).toArray(),
+        db.collection('accessories').find(filtersObj.findObj).project({
+          id: 1, brand: 1, collection: 'accessories', category_t: 1, color: 1, like: 1, link: 1, name: 1, images: 1,
+          oldprice: 1, price: 1, sale: 1, shop: 1, sizes: 1
+        })
+        .sort(filtersObj.sortObj).toArray()
       ]).then(results => [].concat(...results));
     }
 
