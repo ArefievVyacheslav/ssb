@@ -22,7 +22,8 @@ module.exports = async function getProducts(filtersObj) {
           oldprice: 1, price: 1, sale: 1, shop: 1, sizes: 1
         })
         .sort(filtersObj.sortObj)
-        .toArray();
+        .toArray()
+      products = products.map(prod => ({ ...prod, collection: filtersObj.collection }));
     } else {
       products = await Promise.all([
         db.collection('clothes').find(filtersObj.findObj).project({
@@ -49,7 +50,7 @@ module.exports = async function getProducts(filtersObj) {
       result.push(products.slice(s, +e))
     await client.close()
     return {
-      products: result[+filtersObj.pagination.page - 1 || 0].map(prod => ({ ...prod, collection: filtersObj.collection })),
+      products: result[+filtersObj.pagination.page - 1 || 0],
       quantity: products.length
     }
   } catch (e) {
