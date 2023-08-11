@@ -17,18 +17,37 @@ module.exports = async function getSelects(filtersObj) {
       filtersObj.findObj.price[ '$in' ] = [...Array.from(Array(+endPrice - +startPrice + 1).keys(),x => x + +startPrice)]
     }
 
-    const products = await db.collection(filtersObj.collection).find(filtersObj.findObj).project({
-      subcategory: 1, subcategory_t: 1, brand: 1,
-      price: 1,
-      sale: 1,
-      sizes: 1,
-      shop: 1,
-      color: 1, color_t: 1,
-      brandCountry: 1,
-      country: 1, country_t: 1,
-      season: 1, season_t: 1,
-      style: 1, style_t: 1
-    }).toArray()
+    let products;
+    if (filtersObj.collection) {
+      products = await db.collection(filtersObj.collection)
+        .find(filtersObj.findObj)
+        .project({
+          subcategory: 1, subcategory_t: 1,
+          brand: 1, brandCountry: 1, price: 1, sale: 1, sizes: 1, shop: 1,
+          color: 1, color_t: 1,
+          country: 1, country_t: 1,
+          season: 1, season_t: 1,
+          style: 1, style_t: 1
+        })
+        .toArray();
+    } else {
+      const collections = ['clothes', 'shoes', 'accessories'];
+      const collectionPromises = collections.map(async (collection) => {
+        return db.collection(collection)
+          .find(filtersObj.findObj)
+          .project({
+            subcategory: 1, subcategory_t: 1,
+            brand: 1, brandCountry: 1, price: 1, sale: 1, sizes: 1, shop: 1,
+            color: 1, color_t: 1,
+            country: 1, country_t: 1,
+            season: 1, season_t: 1,
+            style: 1, style_t: 1
+          })
+          .toArray();
+      });
+      const results = await Promise.all(collectionPromises);
+      products = results.flat();
+    }
 
     console.log('Товары найдены за ' + (startTime - new Date()) / 1000 + 'sec.')
 
