@@ -13,21 +13,23 @@ module.exports = async function getProducts(filtersObj) {
       filtersObj.findObj.price[ '$in' ] = [...Array.from(Array(+endPrice - +startPrice + 1).keys(),x => x + +startPrice)]
     }
 
-    const products = await db.collection(filtersObj.collection).find(filtersObj.findObj).project({
-      id: 1,
-      brand: 1,
-      category_t: 1,
-      color: 1,
-      like: 1,
-      link: 1,
-      name: 1,
-      images: 1,
-      oldprice: 1,
-      price: 1,
-      sale: 1,
-      shop: 1,
-      sizes: 1
-    }).sort(filtersObj.sortObj).toArray()
+    let products;
+    if (filtersObj.collection) {
+      products = await db.collection(filtersObj.collection)
+        .find(filtersObj.findObj)
+        .project({
+          id: 1, brand: 1, category_t: 1, color: 1, like: 1, link: 1, name: 1, images: 1,
+          oldprice: 1, price: 1, sale: 1, shop: 1, sizes: 1
+        })
+        .sort(filtersObj.sortObj)
+        .toArray();
+    } else {
+      products = await Promise.all([
+        db.collection('clothes').find(filtersObj.findObj).toArray(),
+        db.collection('shoes').find(filtersObj.findObj).toArray(),
+        db.collection('accessories').find(filtersObj.findObj).toArray()
+      ]).then(results => [].concat(...results));
+    }
 
     const result = []
     const count = +filtersObj.pagination.show || 60
