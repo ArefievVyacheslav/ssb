@@ -5,82 +5,55 @@ module.exports = async function getSearchResults(searchTerm) {
   try {
     await client.connect();
     const db = await client.db('ss');
-    let clothes = await db.collection('clothes').find({ $text: { $search: searchTerm } })
-      .project({ score: { $meta: 'textScore' } })
-      .sort({ score: { $meta: 'textScore' } })
-      .toArray() || [];
-    clothes = clothes.map(product => ({
-      id: product.id,
-      brand: product.brand,
-      category_t: product.category_t,
-      collection: 'clothes',
-      color: product.color,
-      like: product.like,
-      link: product.link,
-      name: product.name,
-      images: product.images,
-      oldprice: product.oldprice,
-      price: product.price,
-      sale: product.sale,
-      shop: product.shop,
-      sizes: product.sizes,
-      score: product.score
-    }))
 
-    let shoes = await db.collection('shoes').find({ $text: { $search: searchTerm } })
-      .project({ score: { $meta: 'textScore' } })
-      .sort({ score: { $meta: 'textScore' } })
-      .toArray() || [];
-    shoes = shoes.map(product => ({
-      id: product.id,
-      brand: product.brand,
-      category_t: product.category_t,
-      collection: 'shoes',
-      color: product.color,
-      like: product.like,
-      link: product.link,
-      name: product.name,
-      images: product.images,
-      oldprice: product.oldprice,
-      price: product.price,
-      sale: product.sale,
-      shop: product.shop,
-      sizes: product.sizes,
-      score: product.score
-    }))
+    const [clothes, shoes, accessories] = await Promise.all([
+      db.collection('clothes').find({ $text: { $search: searchTerm } })
+        .project({ score: { $meta: 'textScore' } })
+        .sort({ score: { $meta: 'textScore' } })
+        .toArray(),
 
-    let accessories = await db.collection('accessories').find({ $text: { $search: searchTerm } })
-      .project({ score: { $meta: 'textScore' } })
-      .sort({ score: { $meta: 'textScore' } })
-      .toArray() || []
-    accessories = accessories.map(product => ({
-      id: product.id,
-      brand: product.brand,
-      category_t: product.category_t,
-      collection: 'accessories',
-      color: product.color,
-      like: product.like,
-      link: product.link,
-      name: product.name,
-      images: product.images,
-      oldprice: product.oldprice,
-      price: product.price,
-      sale: product.sale,
-      shop: product.shop,
-      sizes: product.sizes,
-      score: product.score
-    }))
+      db.collection('shoes').find({ $text: { $search: searchTerm } })
+        .project({ score: { $meta: 'textScore' } })
+        .sort({ score: { $meta: 'textScore' } })
+        .toArray(),
 
-    const allResults = [...clothes, ...shoes, ...accessories];
+      db.collection('accessories').find({ $text: { $search: searchTerm } })
+        .project({ score: { $meta: 'textScore' } })
+        .sort({ score: { $meta: 'textScore' } })
+        .toArray()
+    ]);
+
+    const combineAndMap = (products, collection) =>
+      products.map(product => ({
+        id: product.id,
+        brand: product.brand,
+        category_t: product.category_t,
+        collection: collection,
+        color: product.color,
+        like: product.like,
+        link: product.link,
+        name: product.name,
+        images: product.images,
+        oldprice: product.oldprice,
+        price: product.price,
+        sale: product.sale,
+        shop: product.shop,
+        sizes: product.sizes,
+        score: product.score
+      }));
+
+    const allResults = [
+      ...combineAndMap(clothes, 'clothes'),
+      ...combineAndMap(shoes, 'shoes'),
+      ...combineAndMap(accessories, 'accessories')
+    ];
 
     // Сортировка по убыванию релевантности
-    const sortedResults = allResults.sort((a, b) => b.score - a.score);
-
-    return sortedResults;
+    return allResults.sort((a, b) => b.score - a.score);
   } catch (error) {
     console.error('Failed to get search results:', error);
     throw error;
   } finally {
-    client.close();
+    await client.close();
   }
 }
