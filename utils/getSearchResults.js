@@ -9,13 +9,13 @@ module.exports = async function getSearchResults(searchTerm) {
 
     const [clothes, shoes, accessories] = await Promise.all([
       db.collection('clothes').find({})
-        .project({ id: 1, brand: 1, category_t: 1, color: 1, like: 1, link: 1, name: 1, images: 1, oldprice: 1, price: 1, sale: 1, shop: 1, sizes: 1 })
+        .project({ id: 1, brand: 1, category_t: 1, color: 1, gender: 1, like: 1, link: 1, name: 1, images: 1, oldprice: 1, price: 1, sale: 1, shop: 1, sizes: 1 })
         .toArray(),
       db.collection('shoes').find({})
-        .project({ id: 1, brand: 1, category_t: 1, color: 1, like: 1, link: 1, name: 1, images: 1, oldprice: 1, price: 1, sale: 1, shop: 1, sizes: 1 })
+        .project({ id: 1, brand: 1, category_t: 1, color: 1, gender: 1, like: 1, link: 1, name: 1, images: 1, oldprice: 1, price: 1, sale: 1, shop: 1, sizes: 1 })
         .toArray(),
       db.collection('accessories').find({})
-        .project({ id: 1, brand: 1, category_t: 1, color: 1, like: 1, link: 1, name: 1, images: 1, oldprice: 1, price: 1, sale: 1, shop: 1, sizes: 1 })
+        .project({ id: 1, brand: 1, category_t: 1, color: 1, gender: 1, like: 1, link: 1, name: 1, images: 1, oldprice: 1, price: 1, sale: 1, shop: 1, sizes: 1 })
         .toArray()
     ]);
 
@@ -35,8 +35,8 @@ module.exports = async function getSearchResults(searchTerm) {
         sale: product.sale,
         shop: product.shop,
         sizes: product.sizes,
-        textSearch: product.name + ' ' + product.brand + ' ' + collection + ' '
-          + product.color + ' ' + product.shop + ' ' + product.sale + '% '
+        textSearch: product.gender + ' ' + product.subcategory + ' ' + product.brand + ' ' + collection + ' '
+          + product.color + ' ' + product.shop + ' ' + 'со скидкой ' + product.sale + '% '
           + product.sizes.reduce((acc, size) => acc += size + ' размера ', '')
       }));
 
