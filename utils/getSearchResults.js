@@ -1,5 +1,6 @@
 const { MongoClient } = require('mongodb');
 const client = new MongoClient('mongodb://localhost:27017');
+const stringSimilarity = require("string-similarity");
 
 module.exports = async function getSearchResults(searchTerm) {
   try {
@@ -7,19 +8,14 @@ module.exports = async function getSearchResults(searchTerm) {
     const db = await client.db('ss');
 
     const [clothes, shoes, accessories] = await Promise.all([
-      db.collection('clothes').find({ $text: { $search: searchTerm } })
-        .project({ score: { $meta: 'textScore' } })
-        .sort({ score: { $meta: 'textScore' } })
+      db.collection('clothes').find({})
+        .project({ id: 1, brand: 1, category_t: 1, color: 1, like: 1, link: 1, name: 1, images: 1, oldprice: 1, price: 1, sale: 1, shop: 1, sizes: 1 })
         .toArray(),
-
-      db.collection('shoes').find({ $text: { $search: searchTerm } })
-        .project({ score: { $meta: 'textScore' } })
-        .sort({ score: { $meta: 'textScore' } })
+      db.collection('shoes').find({})
+        .project({ id: 1, brand: 1, category_t: 1, color: 1, like: 1, link: 1, name: 1, images: 1, oldprice: 1, price: 1, sale: 1, shop: 1, sizes: 1 })
         .toArray(),
-
-      db.collection('accessories').find({ $text: { $search: searchTerm } })
-        .project({ score: { $meta: 'textScore' } })
-        .sort({ score: { $meta: 'textScore' } })
+      db.collection('accessories').find({})
+        .project({ id: 1, brand: 1, category_t: 1, color: 1, like: 1, link: 1, name: 1, images: 1, oldprice: 1, price: 1, sale: 1, shop: 1, sizes: 1 })
         .toArray()
     ]);
 
@@ -39,7 +35,9 @@ module.exports = async function getSearchResults(searchTerm) {
         sale: product.sale,
         shop: product.shop,
         sizes: product.sizes,
-        score: product.score
+        textSearch: product.name + ' ' + product.brand + ' ' + collection + ' '
+          + product.color + ' ' + product.shop + ' ' + product.sale + '% '
+          + product.sizes.reduce((acc, size) => acc += size + ' размера ', '')
       }));
 
     const allResults = [
@@ -48,8 +46,10 @@ module.exports = async function getSearchResults(searchTerm) {
       ...combineAndMap(accessories, 'accessories')
     ];
 
+    allResults.forEach(productObj => productObj.score = stringSimilarity
+      .compareTwoStrings([...new Set(productObj.textSearch.toLowerCase().split(' '))].join(' '), searchTerm.toLowerCase()))
     // Сортировка по убыванию релевантности
-    return allResults.sort((a, b) => b.score - a.score);
+    return allResults.sort((a, b) => b.score - a.score).filter(product => product.score > 0.25);
   } catch (error) {
     console.error('Failed to get search results:', error);
     throw error;
