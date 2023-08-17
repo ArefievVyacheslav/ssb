@@ -49,7 +49,7 @@ module.exports = async function getSearchResults(searchTerm) {
     allResults.forEach(productObj => productObj.score = stringSimilarity
       .compareTwoStrings([...new Set(productObj.textSearch.toLowerCase().split(' '))].join(' '), searchTerm.toLowerCase()))
     // Сортировка по убыванию релевантности
-    return allResults.sort((a, b) => b.score - a.score).filter(product => product.score > 0.25);
+    return allResults.sort((a, b) => b.score - a.score).filter(product => product.score > 0.15);
   } catch (error) {
     console.error('Failed to get search results:', error);
     throw error;
