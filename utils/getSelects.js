@@ -2,7 +2,7 @@ const { MongoClient } = require('mongodb')
 const client = new MongoClient('mongodb://localhost:27017')
 
 
-const unique = (array, propertyName) => array.filter((e, i) => array.findIndex(a => a[propertyName] === e[propertyName]) === i)
+const unique = (array, propertyName) => array.filter((e, i) => array.findIndex(a => a[propertyName].toLowerCase() === e[propertyName].toLowerCase()) === i)
 
 
 module.exports = async function getSelects(filtersObj) {
