@@ -108,7 +108,6 @@ module.exports = async function getSelects(filtersObj) {
       return aIndex - bIndex;
     }
     result.size = size.sort(compareSizes)
-    await client.close()
     return result
   } catch (e) {
     console.log(e);
