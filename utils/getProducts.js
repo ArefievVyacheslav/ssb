@@ -18,7 +18,7 @@ module.exports = async function getProducts(filtersObj) {
       products = await db.collection(filtersObj.collection)
         .find(filtersObj.findObj)
         .project({
-          id: 1, brand: 1, color: 1, like: 1, link: 1, name: 1, images: 1,
+          id: 1, brand: 1, category: 1, color: 1, like: 1, link: 1, name: 1, images: 1,
           oldprice: 1, price: 1, sale: 1, shop: 1, sizes: 1
         })
         .sort(filtersObj.sortObj)
@@ -27,17 +27,17 @@ module.exports = async function getProducts(filtersObj) {
     } else {
       products = await Promise.all([
         db.collection('clothes').find(filtersObj.findObj).project({
-          id: 1, brand: 1, collection: 'clothes', color: 1, like: 1, link: 1, name: 1, images: 1,
+          id: 1, brand: 1, collection: 'clothes', category: 1, color: 1, like: 1, link: 1, name: 1, images: 1,
           oldprice: 1, price: 1, sale: 1, shop: 1, sizes: 1
         })
         .sort(filtersObj.sortObj).toArray(),
         db.collection('shoes').find(filtersObj.findObj).project({
-          id: 1, brand: 1, collection: 'shoes', color: 1, like: 1, link: 1, name: 1, images: 1,
+          id: 1, brand: 1, collection: 'shoes', category: 1, color: 1, like: 1, link: 1, name: 1, images: 1,
           oldprice: 1, price: 1, sale: 1, shop: 1, sizes: 1
         })
         .sort(filtersObj.sortObj).toArray(),
         db.collection('accessories').find(filtersObj.findObj).project({
-          id: 1, brand: 1, collection: 'accessories', color: 1, like: 1, link: 1, name: 1, images: 1,
+          id: 1, brand: 1, collection: 'accessories', category: 1, color: 1, like: 1, link: 1, name: 1, images: 1,
           oldprice: 1, price: 1, sale: 1, shop: 1, sizes: 1
         })
         .sort(filtersObj.sortObj).toArray()
