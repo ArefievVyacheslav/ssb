@@ -60,16 +60,8 @@ async function connectToDatabase() {
 
     server.post('/products', async (req, res) => {
       try {
-        const cacheKey = JSON.stringify({ route: 'products', params: req.body });
-        const cachedResult = await collection.findOne({ _id: cacheKey });
-
-        if (cachedResult) {
-          res.status(200).send(cachedResult.data);
-        } else {
-          const result = await getProducts(req.body);
-          await collection.insertOne({ _id: cacheKey, data: result });
-          res.status(200).send(result);
-        }
+        const result = await getProducts(req.body);
+        res.status(200).send(result);
       } catch (error) {
         res.status(500).send(error);
       }
