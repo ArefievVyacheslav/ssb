@@ -96,17 +96,17 @@ async function connectToDatabase() {
     server.post('/search', async (req, res) => {
       try {
         const searchTerm = req.body.searchTerm; // Получаем поисковый запрос из параметров запроса
-
-        const cacheKey = JSON.stringify({ route: 'search', query: searchTerm });
-        const cachedResult = await collection.findOne({ _id: cacheKey });
-
-        if (cachedResult) {
-          res.status(200).send(cachedResult.data);
-        } else {
-          const result = await getSearchResults(searchTerm); // Используйте соответствующую функцию для выполнения поиска
-          await collection.insertOne({ _id: cacheKey, data: result });
-          res.status(200).send(result);
-        }
+        //
+        // const cacheKey = JSON.stringify({ route: 'search', query: searchTerm });
+        // const cachedResult = await collection.findOne({ _id: cacheKey });
+        //
+        // if (cachedResult) {
+        //   res.status(200).send(cachedResult.data);
+        // } else {
+        const result = await getSearchResults(searchTerm); // Используйте соответствующую функцию для выполнения поиска
+        // await collection.insertOne({ _id: cacheKey, data: result });
+        res.status(200).send(result);
+        // }
       } catch (error) {
         res.status(500).send(error);
       }
