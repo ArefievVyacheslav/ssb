@@ -27,8 +27,8 @@ async function getProducts(filtersObj) {
         }
       })
       .sort(filtersObj.sortObj)
-      .limit(filtersObj.pagination.show)
       .skip((filtersObj.pagination.page - 1) * filtersObj.pagination.show)
+      .limit(filtersObj.pagination.show)
       .toArray()
     products = products.map(prod => ({ ...prod, collection: filtersObj.collection }));
     productCounts = await db.collection(filtersObj.collection || 'all').countDocuments(filtersObj.findObj)
