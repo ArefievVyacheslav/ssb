@@ -16,22 +16,28 @@ async function getProducts(filtersObj) {
       }
     }
 
-    let products;
-    let productCounts;
-
-    products = await db.collection(filtersObj.collection || 'all')
-      .find(filtersObj.findObj, {
-        projection: {
+    let products = await db.collection(filtersObj.collection || 'all').aggregate([
+      {
+        $match: filtersObj.findObj
+      },
+      {
+        $project: {
           id: 1, brand: 1, category: 1, color: 1, like: 1, link: 1, name: 1, images: 1,
           oldprice: 1, price: 1, sale: 1, shop: 1, sizes: 1
         }
-      })
-      .sort(filtersObj.sortObj)
-      .skip((filtersObj.pagination.page - 1) * filtersObj.pagination.show)
-      .limit(filtersObj.pagination.show)
-      .toArray()
+      },
+      {
+        $sort: filtersObj.sortObj
+      },
+      {
+        $limit: filtersObj.pagination.show
+      },
+      {
+        $skip: (filtersObj.pagination.page - 1) * filtersObj.pagination.show
+      }
+    ]).toArray()
     products = products.map(prod => ({ ...prod, collection: filtersObj.collection }));
-    productCounts = await db.collection(filtersObj.collection || 'all').countDocuments(filtersObj.findObj)
+    let productCounts = await db.collection(filtersObj.collection || 'all').countDocuments(filtersObj.findObj)
     return {
       products: products,
       quantity: productCounts
