@@ -10,7 +10,10 @@ async function getProducts(filtersObj) {
     if (filtersObj.findObj?.price) {
       const startPrice = filtersObj.findObj.price['$in'][0]
       const endPrice = filtersObj.findObj.price['$in'][1]
-      filtersObj.findObj.price['$in'] = [...Array.from(Array(+endPrice - +startPrice + 1).keys(), x => x + +startPrice)]
+      filtersObj.findObj.price['$in'] = {
+        $gte: startPrice,
+        $lte: endPrice
+      }
     }
 
     let products;
@@ -23,9 +26,9 @@ async function getProducts(filtersObj) {
           oldprice: 1, price: 1, sale: 1, shop: 1, sizes: 1
         }
       })
+      .sort(filtersObj.sortObj)
       .limit(filtersObj.pagination.show)
       .skip((filtersObj.pagination.page - 1) * filtersObj.pagination.show)
-      .sort(filtersObj.sortObj)
       .toArray()
     products = products.map(prod => ({ ...prod, collection: filtersObj.collection }));
     productCounts = await db.collection(filtersObj.collection || 'all').countDocuments(filtersObj.findObj)
