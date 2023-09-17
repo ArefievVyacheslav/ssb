@@ -6,7 +6,6 @@ const unique = (array, propertyName) => array.filter((e, i) => array.findIndex(a
 
 
 module.exports = async function getSelects(filtersObj) {
-  console.log(filtersObj)
   try {
     await client.connect()
     const db = await client.db('ss')
@@ -14,12 +13,12 @@ module.exports = async function getSelects(filtersObj) {
     if (filtersObj.findObj?.price) {
       const startPrice = filtersObj.findObj.price[ '$in' ][0]
       const endPrice = filtersObj.findObj.price[ '$in' ][1]
-      filtersObj.findObj.price['$in'] = {
+      filtersObj.findObj.price = {
         $gte: startPrice,
         $lte: endPrice
       }
     }
-
+    console.log(filtersObj.findObj)
     let products;
     products = await db.collection(filtersObj.collection || 'all')
       .find(filtersObj.findObj, {

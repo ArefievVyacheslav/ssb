@@ -19,7 +19,7 @@ module.exports = async function getSelectsAll() {
     if (filtersObj.findObj?.price) {
       const startPrice = filtersObj.findObj.price[ '$in' ][0]
       const endPrice = filtersObj.findObj.price[ '$in' ][1]
-      filtersObj.findObj.price['$in'] = {
+      filtersObj.findObj.price = {
         $gte: startPrice,
         $lte: endPrice
       }
