@@ -1,12 +1,17 @@
 const { MongoClient } = require('mongodb')
 const client = new MongoClient('mongodb://localhost:27017')
 
-
 const unique = (array, propertyName) => array.filter((e, i) => array.findIndex(a => a[propertyName] === e[propertyName]) === i)
 
 
-module.exports = async function getSelects(filtersObj) {
-  console.log(filtersObj)
+module.exports = async function getSelectsAll() {
+  const filtersObj = {
+    findObj: {
+      age: 'Взрослый',
+      delivery: { '$in': [ 'ru', 'rb', 'kz', 'am', 'kg', 'az', 'md', 'tj', 'uz', 'tm' ] },
+      installment: { '$in': [ true, false ] }
+    }
+  }
   try {
     await client.connect()
     const db = await client.db('ss')

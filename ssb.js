@@ -5,6 +5,7 @@ const { MongoClient } = require('mongodb');
 
 const getBrands = require('./utils/getBrands')
 const getSelects = require('./utils/getSelects');
+const getSelectsAll = require('./utils/getSelectsAll');
 const getProducts = require('./utils/getProducts');
 const getProduct = require('./utils/getProduct');
 const getSitemap = require('./utils/getSitemap');
@@ -50,6 +51,23 @@ async function connectToDatabase() {
           res.status(200).send(cachedResult.data);
         } else {
           const result = await getSelects(req.body);
+          await collection.insertOne({ _id: cacheKey, data: result });
+          res.status(200).send(result);
+        }
+      } catch (error) {
+        res.status(500).send(error);
+      }
+    });
+
+    server.get('/selects-all', async (req, res) => {
+      try {
+        const cacheKey = JSON.stringify({ route: 'selects-all', params: req.body });
+        const cachedResult = await collection.findOne({ _id: cacheKey });
+
+        if (cachedResult) {
+          res.status(200).send(cachedResult.data);
+        } else {
+          const result = await getSelectsAll();
           await collection.insertOne({ _id: cacheKey, data: result });
           res.status(200).send(result);
         }
