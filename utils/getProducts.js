@@ -18,9 +18,7 @@ async function getProducts(filtersObj) {
 
     let products;
     let productCounts;
-    const getCollection = itemType => [
-      { clothes: 'Одежда' }, { shoes: 'Обувь' }, { accessories: 'Аксессуары' }
-    ].find(item => item[itemType] !== undefined && Object.keys(item)[0])
+    const getCollection = itemType => ({ 'Одежда': 'clothes', 'Обувь': 'shoes', 'Аксессуары': 'accessories' })[itemType];
 
     products = await db.collection(filtersObj.collection || 'all')
       .find(filtersObj.findObj, {
