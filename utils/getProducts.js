@@ -18,6 +18,9 @@ async function getProducts(filtersObj) {
 
     let products;
     let productCounts;
+    const getCollection = itemType => [
+      { clothes: 'Одежда' }, { shoes: 'Обувь' }, { accessories: 'Аксессуары' }
+    ].find(item => item[itemType] !== undefined && Object.keys(item)[0])
 
     products = await db.collection(filtersObj.collection || 'all')
       .find(filtersObj.findObj, {
@@ -30,7 +33,7 @@ async function getProducts(filtersObj) {
       .skip((filtersObj.pagination.page - 1) * filtersObj.pagination.show)
       .limit(filtersObj.pagination.show)
       .toArray()
-    products = products.map(prod => ({ ...prod, collection: filtersObj.collection }));
+    products = products.map(prod => ({ ...prod, collection: filtersObj.collection || getCollection(prod.category) }));
     productCounts = await db.collection(filtersObj.collection || 'all').countDocuments(filtersObj.findObj)
     return {
       products: products,

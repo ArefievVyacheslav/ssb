@@ -18,7 +18,7 @@ module.exports = async function getSelects(filtersObj) {
         $lte: endPrice
       }
     }
-    console.log(filtersObj.findObj)
+
     let products;
     products = await db.collection(filtersObj.collection || 'all')
       .find(filtersObj.findObj, {
@@ -43,7 +43,7 @@ module.exports = async function getSelects(filtersObj) {
 
     const result = { subCat,brand:[],brandCountry:[],color:[],country:[],price:[],sale:[],season:[],shop:[],style:[] }
 
-    products.map(productObj => {
+    products.forEach(productObj => {
       if (!result.brand.includes(productObj.brand.toUpperCase())) result.brand.push(productObj.brand.toUpperCase())
       if (!result.price.includes(productObj.price)) result.price.push(productObj.price)
       if (!result.sale.includes(productObj.sale)) result.sale.push(productObj.sale)
