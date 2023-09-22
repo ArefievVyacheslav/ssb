@@ -24,14 +24,21 @@ async function getProducts(filtersObj) {
       .find(filtersObj.findObj, {
         projection: {
           id: 1, brand: 1, category: 1, color: 1, like: 1, link: 1, name: 1, images: 1,
-          oldprice: 1, price: 1, sale: 1, shop: 1, sizes: 1
+          imageCatalog: 1, oldprice: 1, price: 1, sale: 1, shop: 1, sizes: 1
         }
       })
       .sort(filtersObj.sortObj)
       .skip((filtersObj.pagination.page - 1) * filtersObj.pagination.show)
       .limit(filtersObj.pagination.show)
       .toArray()
-    products = products.map(prod => ({ ...prod, collection: filtersObj.collection || getCollection(prod.category) }));
+    products = products.map(prod => ({ ...prod, collection: filtersObj.collection || getCollection(prod.category) }))
+    products.forEach(prod => {
+        prod.imageCatalog
+          ? prod.image = prod.imageCatalog
+          : prod.image = prod.images[0]
+        delete prod.images
+        delete prod.imageCatalog
+      })
     productCounts = await db.collection(filtersObj.collection || 'all').countDocuments(filtersObj.findObj)
     return {
       products: products,
