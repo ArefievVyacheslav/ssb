@@ -20,12 +20,7 @@ const COLLECTION_NAME = 'cache';
 
 const server = express();
 
-server.use(cors({
-  origin: 'http://localhost:3003',
-  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-  credentials: true,
-}));
-
+server.use(cors());
 server.use(bodyParser.json());
 
 let client;
